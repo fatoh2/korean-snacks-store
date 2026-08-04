@@ -72,11 +72,53 @@ export default function Navbar() {
     <nav style={{ background: 'var(--nav-bg)', backdropFilter: 'blur(14px)', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 50, boxShadow: 'var(--shadow-sm)' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64, direction: 'ltr', flexDirection: isRTL ? 'row' : 'row-reverse' }}>
 
-        {/* Logo */}
-        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Logo size={82} />
-          <span style={{ fontWeight: 900, fontSize: 19, background: 'linear-gradient(135deg, var(--brand), var(--brand-blue))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: -0.5, whiteSpace: 'nowrap' }}>Lulu Tokki</span>
-        </Link>
+        {/* Brand side: logo and display preferences */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+          <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Logo size={82} />
+            <span style={{ fontWeight: 900, fontSize: 19, background: 'linear-gradient(135deg, var(--brand), var(--brand-blue))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: -0.5, whiteSpace: 'nowrap' }}>Lulu Tokki</span>
+          </Link>
+
+          {!isMobile && (
+            <>
+              <span style={{ width: 1, height: 24, background: 'var(--border)', marginInline: 3 }} />
+              <button
+                onClick={toggleDark}
+                title={dark ? 'Light mode' : 'Dark mode'}
+                style={{ ...iconBtnStyle, fontSize: 16, padding: '6px 10px' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; }}
+              >
+                {dark ? '☀️' : '🌙'}
+              </button>
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={e => { e.stopPropagation(); setLangOpen(o => !o); }}
+                  style={iconBtnStyle}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand)'; e.currentTarget.style.color = 'var(--brand)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--subtext)'; }}
+                >
+                  {currentLangLabel} ▾
+                </button>
+                {langOpen && (
+                  <div style={{ position: 'absolute', top: '110%', left: 0, background: 'var(--card)', border: '2px solid var(--border)', borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', overflow: 'hidden', zIndex: 100, minWidth: 120 }}>
+                    {LANGS.map(l => (
+                      <button
+                        key={l.code}
+                        onClick={() => { setLang(l.code); setLangOpen(false); }}
+                        style={{ display: 'block', width: '100%', padding: '10px 16px', border: 'none', background: lang === l.code ? 'var(--brand-soft)' : 'transparent', color: lang === l.code ? 'var(--brand)' : 'var(--text)', fontFamily: 'Cairo, sans-serif', fontWeight: lang === l.code ? 800 : 600, fontSize: 14, cursor: 'pointer', textAlign: 'start' }}
+                        onMouseEnter={e => { if (lang !== l.code) e.currentTarget.style.background = 'var(--muted-bg)'; }}
+                        onMouseLeave={e => { if (lang !== l.code) e.currentTarget.style.background = 'transparent'; }}
+                      >
+                        {l.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: isRTL ? 'row-reverse' : 'row' }}>
           {!isMobile && (
@@ -111,48 +153,6 @@ export default function Navbar() {
                 </>
               )}
             </>
-          )}
-
-          {/* Dark mode toggle — desktop only */}
-          {!isMobile && (
-            <button
-              onClick={toggleDark}
-              title={dark ? 'Light mode' : 'Dark mode'}
-              style={{ ...iconBtnStyle, fontSize: 16, padding: '6px 10px' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand)'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; }}
-            >
-              {dark ? '☀️' : '🌙'}
-            </button>
-          )}
-
-          {/* Lang dropdown — desktop only */}
-          {!isMobile && (
-            <div style={{ position: 'relative' }}>
-              <button
-                onClick={e => { e.stopPropagation(); setLangOpen(o => !o); }}
-                style={iconBtnStyle}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand)'; e.currentTarget.style.color = 'var(--brand)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--subtext)'; }}
-              >
-                {currentLangLabel} ▾
-              </button>
-              {langOpen && (
-                <div style={{ position: 'absolute', top: '110%', right: 0, background: 'var(--card)', border: '2px solid var(--border)', borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', overflow: 'hidden', zIndex: 100, minWidth: 120 }}>
-                  {LANGS.map(l => (
-                    <button
-                      key={l.code}
-                      onClick={() => { setLang(l.code); setLangOpen(false); }}
-                      style={{ display: 'block', width: '100%', padding: '10px 16px', border: 'none', background: lang === l.code ? 'var(--brand-soft)' : 'transparent', color: lang === l.code ? 'var(--brand)' : 'var(--text)', fontFamily: 'Cairo, sans-serif', fontWeight: lang === l.code ? 800 : 600, fontSize: 14, cursor: 'pointer', textAlign: 'start' }}
-                      onMouseEnter={e => { if (lang !== l.code) e.currentTarget.style.background = 'var(--muted-bg)'; }}
-                      onMouseLeave={e => { if (lang !== l.code) e.currentTarget.style.background = 'transparent'; }}
-                    >
-                      {l.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
           )}
 
           {/* Hamburger */}
