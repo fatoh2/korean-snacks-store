@@ -316,6 +316,51 @@ body {
 }
 
 /* Home — premium service promises */
+.home-hero-logo {
+  position: relative;
+  isolation: isolate;
+  width: fit-content;
+  margin: 0 auto 4px;
+  display: flex;
+  justify-content: center;
+  transform-origin: 50% 55%;
+}
+
+.home-hero-logo::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 16% 12% 13%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 241, 203, 0.27), rgba(184, 100, 125, 0.08) 48%, transparent 72%);
+  filter: blur(18px);
+  opacity: 0.75;
+}
+
+.home-hero-logo img {
+  filter: drop-shadow(0 14px 20px rgba(33, 20, 18, 0.22));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-hero-logo {
+    animation: logo-float 5.5s ease-in-out infinite;
+  }
+
+  .home-hero-logo::before {
+    animation: logo-halo 5.5s ease-in-out infinite;
+  }
+}
+
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.018); }
+}
+
+@keyframes logo-halo {
+  0%, 100% { opacity: 0.58; transform: scale(0.94); }
+  50% { opacity: 0.88; transform: scale(1.06); }
+}
+
 .home-services {
   position: relative;
   padding: 34px 20px;

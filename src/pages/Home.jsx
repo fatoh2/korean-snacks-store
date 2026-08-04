@@ -58,7 +58,7 @@ export default function Home() {
         overflow: 'hidden',
       }}>
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 720 }}>
-          <div style={{ marginBottom: 4, display: 'flex', justifyContent: 'center' }}>
+          <div className="home-hero-logo">
             <Logo size={isMobile ? 270 : 330} natural />
           </div>
           <h1 style={{ color: 'white', fontSize: isMobile ? 28 : 38, fontWeight: 900, margin: '0 0 18px', lineHeight: 1.25 }}>
