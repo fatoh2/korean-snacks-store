@@ -48,18 +48,18 @@ export default function Home() {
         backgroundImage: `linear-gradient(125deg, rgba(83,46,55,0.93) 0%, rgba(142,72,94,0.89) 48%, rgba(190,151,76,0.78) 100%), url(${HERO_BG})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        minHeight: 520,
+        minHeight: 480,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
-        padding: '72px 20px',
+        padding: isMobile ? '32px 20px 38px' : '40px 20px 46px',
         position: 'relative',
         overflow: 'hidden',
       }}>
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 720 }}>
-          <div style={{ marginBottom: -10, display: 'flex', justifyContent: 'center' }}>
-            <Logo size={380} />
+          <div style={{ marginBottom: 4, display: 'flex', justifyContent: 'center' }}>
+            <Logo size={isMobile ? 270 : 330} natural />
           </div>
           <h1 style={{ color: 'white', fontSize: isMobile ? 28 : 38, fontWeight: 900, margin: '0 0 18px', lineHeight: 1.25 }}>
             {t('heroTitle')}
@@ -87,7 +87,7 @@ export default function Home() {
           </div>
 
           {/* Stats */}
-          <div style={{ display: 'flex', gap: 36, justifyContent: 'center', marginTop: 52, flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: 36 }}>
+          <div style={{ display: 'flex', gap: 36, justifyContent: 'center', marginTop: 38, flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: 26 }}>
             {[
               { num: `${products.length}+`, label: t('heroStatProducts') },
               { num: '5', label: t('heroStatCategories') },
