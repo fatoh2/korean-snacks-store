@@ -4,6 +4,7 @@ import { useProducts } from '../context/ProductsContext';
 import { useLanguage } from '../context/LanguageContext';
 import ProductCard from '../components/ProductCard';
 import Logo from '../components/Logo';
+import CategoryIcon from '../components/CategoryIcon';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 900);
@@ -18,11 +19,11 @@ function useIsMobile() {
 const HERO_BG = 'https://images.unsplash.com/photo-1744870132190-5c02d3f8d9f9?w=1600&q=80&auto=format&fit=crop';
 
 const CATEGORIES = [
-  { key: 'رامن', emoji: '🍜', tKey: 'catRamen' },
-  { key: 'رقائق', emoji: '🍟', tKey: 'catChips' },
-  { key: 'حلوى', emoji: '🍬', tKey: 'catCandy' },
-  { key: 'مشروبات', emoji: '🧃', tKey: 'catDrinks' },
-  { key: 'بسكويت', emoji: '🍪', tKey: 'catBiscuits' },
+  { key: 'رامن', icon: 'ramen', tKey: 'catRamen' },
+  { key: 'رقائق', icon: 'chips', tKey: 'catChips' },
+  { key: 'حلوى', icon: 'candy', tKey: 'catCandy' },
+  { key: 'مشروبات', icon: 'drinks', tKey: 'catDrinks' },
+  { key: 'بسكويت', icon: 'biscuits', tKey: 'catBiscuits' },
 ];
 
 const FEATURES = [
@@ -159,7 +160,7 @@ export default function Home() {
                 onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--brand)'; e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(232,138,166,0.12)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--card-border)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
               >
-                <div style={{ fontSize: 46, marginBottom: 10, lineHeight: 1 }}>{cat.emoji}</div>
+                <div className="category-icon-frame"><CategoryIcon type={cat.icon} size={46} /></div>
                 <div style={{ fontWeight: 800, fontSize: 15, color: 'var(--text)', marginBottom: 4 }}>{t(cat.tKey)}</div>
                 <div style={{ fontSize: 12, color: 'var(--muted)' }}>{catCount(cat.key)} {t('catItems')}</div>
               </Link>

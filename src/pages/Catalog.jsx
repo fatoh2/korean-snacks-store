@@ -4,6 +4,7 @@ import { useProducts } from '../context/ProductsContext';
 import { useLanguage } from '../context/LanguageContext';
 import ProductCard from '../components/ProductCard';
 import Pagination from '../components/Pagination';
+import CategoryIcon from '../components/CategoryIcon';
 
 const CATEGORIES = ['الكل', 'رامن', 'رقائق', 'حلوى', 'مشروبات', 'بسكويت'];
 const PAGE_SIZE = 20;
@@ -117,9 +118,9 @@ export default function Catalog() {
             <img src="/logo-nobg.png" alt="" />
             <span>WORLD FLAVOURS</span>
           </div>
-          <span className="catalog-hero__snack catalog-hero__snack--one">🍜</span>
-          <span className="catalog-hero__snack catalog-hero__snack--two">🍡</span>
-          <span className="catalog-hero__snack catalog-hero__snack--three">🥤</span>
+          <span className="catalog-hero__snack catalog-hero__snack--one"><CategoryIcon type="ramen" size={25} /></span>
+          <span className="catalog-hero__snack catalog-hero__snack--two"><CategoryIcon type="candy" size={25} /></span>
+          <span className="catalog-hero__snack catalog-hero__snack--three"><CategoryIcon type="drinks" size={25} /></span>
         </div>
 
         <div className="catalog-hero__edition" aria-hidden="true">LULU TOKKI · EST. 2026</div>

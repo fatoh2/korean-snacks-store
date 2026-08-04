@@ -3,13 +3,14 @@ import { useParams, Link } from 'react-router-dom';
 import { useProducts } from '../context/ProductsContext';
 import { useLanguage } from '../context/LanguageContext';
 import ProductCard from '../components/ProductCard';
+import CategoryIcon from '../components/CategoryIcon';
 
 const CAT_META = {
-  'رامن':    { emoji: '🍜', en: 'Ramen',    he: 'ראמן',       gradient: 'linear-gradient(135deg,var(--brand) 0%,var(--brand-dark) 100%)' },
-  'رقائق':   { emoji: '🍟', en: 'Chips',    he: 'צ׳יפס',      gradient: 'linear-gradient(135deg,#d97706 0%,#b45309 100%)' },
-  'حلوى':    { emoji: '🍬', en: 'Candy',    he: 'ממתקים',     gradient: 'linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%)' },
-  'مشروبات': { emoji: '🧃', en: 'Drinks',   he: 'משקאות',     gradient: 'linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%)' },
-  'بسكويت':  { emoji: '🍪', en: 'Biscuits', he: 'ביסקוויטים', gradient: 'linear-gradient(135deg,#c2410c 0%,#9a3412 100%)' },
+  'رامن':    { icon: 'ramen', en: 'Ramen',    he: 'ראמן',       gradient: 'linear-gradient(135deg,var(--brand) 0%,var(--brand-dark) 100%)' },
+  'رقائق':   { icon: 'chips', en: 'Chips',    he: 'צ׳יפס',      gradient: 'linear-gradient(135deg,#b8944f 0%,#80642f 100%)' },
+  'حلوى':    { icon: 'candy', en: 'Candy',    he: 'ממתקים',     gradient: 'linear-gradient(135deg,#b8647d 0%,#754153 100%)' },
+  'مشروبات': { icon: 'drinks', en: 'Drinks',   he: 'משקאות',     gradient: 'linear-gradient(135deg,#8d6f65 0%,#4d3b36 100%)' },
+  'بسكويت':  { icon: 'biscuits', en: 'Biscuits', he: 'ביסקוויטים', gradient: 'linear-gradient(135deg,#c2a060 0%,#74582c 100%)' },
 };
 
 const SORT_OPTIONS_AR = [
@@ -43,7 +44,7 @@ export default function Category() {
   const [sort, setSort] = useState('featured');
   const [onlyInStock, setOnlyInStock] = useState(false);
 
-  const meta = CAT_META[decoded] || { emoji: '🛍️', en: decoded, he: decoded, gradient: 'linear-gradient(135deg,var(--brand),var(--brand-blue))' };
+  const meta = CAT_META[decoded] || { icon: 'all', en: decoded, he: decoded, gradient: 'linear-gradient(135deg,var(--brand),var(--brand-blue))' };
   const sortOptions = tr(SORT_OPTIONS_AR, SORT_OPTIONS_EN, SORT_OPTIONS_HE);
 
   const sorted = useMemo(() => {
@@ -95,7 +96,7 @@ export default function Category() {
             {allCount} {tr('منتج', 'products', 'מוצרים')}
           </p>
         </div>
-        <div style={{ fontSize: 90, opacity: 0.9, position: 'relative', zIndex: 1 }}>{meta.emoji}</div>
+        <div className="category-hero-icon"><CategoryIcon type={meta.icon} size={78} /></div>
         <div style={{ position: 'absolute', top: -20, left: -20, width: 120, height: 120, background: 'rgba(255,255,255,0.06)', borderRadius: '50%' }} />
         <div style={{ position: 'absolute', bottom: -30, left: 60, width: 160, height: 160, background: 'rgba(255,255,255,0.06)', borderRadius: '50%' }} />
       </div>
@@ -145,7 +146,7 @@ export default function Category() {
       {/* Products Grid */}
       {sorted.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--subtext)' }}>
-          <div style={{ fontSize: 60, marginBottom: 16 }}>{meta.emoji}</div>
+          <div className="category-empty-icon"><CategoryIcon type={meta.icon} size={54} /></div>
           <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: 'var(--text)' }}>
             {tr('لا توجد منتجات متاحة', 'No products available', 'אין מוצרים זמינים')}
           </div>
