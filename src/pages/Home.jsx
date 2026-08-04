@@ -44,7 +44,7 @@ export default function Home() {
     <div>
       {/* ── Hero ── */}
       <div style={{
-        backgroundImage: `linear-gradient(135deg, rgba(232,138,166,0.90) 0%, rgba(208,111,143,0.86) 45%, rgba(143,188,217,0.90) 100%), url(${HERO_BG})`,
+        backgroundImage: `linear-gradient(125deg, rgba(83,46,55,0.93) 0%, rgba(142,72,94,0.89) 48%, rgba(190,151,76,0.78) 100%), url(${HERO_BG})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         minHeight: 520,
@@ -69,7 +69,7 @@ export default function Home() {
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button
               onClick={() => navigate('/store')}
-              style={{ padding: '14px 38px', borderRadius: 14, background: 'white', color: 'var(--brand)', fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', transition: 'transform 0.15s, box-shadow 0.15s' }}
+              style={{ padding: '14px 38px', borderRadius: 14, background: 'var(--brand-ivory)', color: 'var(--brand-dark)', fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 16, cursor: 'pointer', border: '1px solid rgba(255,255,255,0.45)', boxShadow: '0 8px 28px rgba(31,20,18,0.22)', transition: 'transform 0.15s, box-shadow 0.15s' }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(0,0,0,0.28)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)'; }}
             >

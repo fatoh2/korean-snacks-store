@@ -69,7 +69,7 @@ export default function Navbar() {
   const firstName = user?.name?.split(' ')[0] || '';
 
   return (
-    <nav style={{ background: 'var(--nav-bg)', borderBottom: '2px solid var(--brand)', position: 'sticky', top: 0, zIndex: 50, boxShadow: 'var(--shadow-md)' }}>
+    <nav style={{ background: 'var(--nav-bg)', backdropFilter: 'blur(14px)', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 50, boxShadow: 'var(--shadow-sm)' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64, direction: 'ltr', flexDirection: isRTL ? 'row' : 'row-reverse' }}>
 
         {/* Logo */}

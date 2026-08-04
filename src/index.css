@@ -13,26 +13,28 @@
 
 /* ── Design Tokens (CSS Custom Properties) ── */
 :root {
-  --bg:          #f8f9fb;
-  --card:        #ffffff;
-  --card-border: 1px solid #f0f0f0;
-  --text:        #1a1a2e;
-  --subtext:     #6b7280;
-  --muted:       #9ca3af;
-  --border:      #e5e7eb;
-  --input-bg:    #ffffff;
-  --muted-bg:    #f3f4f6;
-  --nav-bg:      #ffffff;
-  --shadow-sm:   0 2px 8px rgba(0,0,0,0.06);
-  --shadow-md:   0 2px 12px rgba(0,0,0,0.07);
-  --shadow-lg:   0 4px 20px rgba(0,0,0,0.08);
+  --bg:          #f7f3ee;
+  --card:        #fffdf9;
+  --card-border: 1px solid #ebe1d9;
+  --text:        #2c2422;
+  --subtext:     #776b66;
+  --muted:       #a49790;
+  --border:      #e7ddd5;
+  --input-bg:    #fffdf9;
+  --muted-bg:    #f1ebe5;
+  --nav-bg:      rgba(255, 253, 249, 0.96);
+  --shadow-sm:   0 2px 8px rgba(67,45,39,0.06);
+  --shadow-md:   0 5px 18px rgba(67,45,39,0.08);
+  --shadow-lg:   0 12px 32px rgba(67,45,39,0.11);
 
   /* ── Lulu Tokki brand palette (pastel) ── */
-  --brand:        #e88aa6;
-  --brand-dark:   #d06f8f;
-  --brand-soft:   #fdeef3;
-  --brand-blue:   #8fbcd9;
-  --brand-yellow: #f2d27e;
+  --brand:        #b8647d;
+  --brand-dark:   #8e485e;
+  --brand-soft:   #f6e7eb;
+  --brand-blue:   #b8944f;
+  --brand-yellow: #d4b66a;
+  --brand-gold:   #b8944f;
+  --brand-ivory:  #fffaf0;
 }
 
 [data-theme="dark"] {
@@ -49,7 +51,12 @@
   --shadow-sm:   0 2px 8px rgba(0,0,0,0.35);
   --shadow-md:   0 2px 12px rgba(0,0,0,0.45);
   --shadow-lg:   0 4px 20px rgba(0,0,0,0.55);
-  --brand-soft:  #3a2731;
+  --brand:       #d58da2;
+  --brand-dark:  #e5a9ba;
+  --brand-soft:  #3a272e;
+  --brand-blue:  #d1b36f;
+  --brand-yellow:#d1b36f;
+  --brand-gold:  #d1b36f;
 }
 
 /* Smooth theme transitions */
@@ -66,6 +73,7 @@ body {
   color: var(--text);
   margin: 0;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
 #root {
@@ -113,7 +121,7 @@ body {
   border: 1px solid #eadfd6;
   border-radius: 30px;
   background:
-    radial-gradient(circle at 8% 12%, rgba(232, 138, 166, 0.14), transparent 28%),
+    radial-gradient(circle at 8% 12%, rgba(184, 100, 125, 0.13), transparent 28%),
     linear-gradient(118deg, #fffdf9 0%, #f8f1e9 100%);
   box-shadow: 0 24px 60px rgba(74, 52, 46, 0.11), 0 2px 8px rgba(74, 52, 46, 0.05);
 }
@@ -366,9 +374,9 @@ body {
   height: 38px;
   display: grid;
   place-items: center;
-  color: #fff8f2;
+  color: #fffaf0;
   border-radius: 50%;
-  background: #2b2523;
+  background: linear-gradient(145deg, #332a27, #211b19);
   box-shadow: 0 8px 20px rgba(43, 37, 35, 0.16);
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 17px;

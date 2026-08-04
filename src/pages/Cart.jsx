@@ -62,7 +62,7 @@ export default function Cart() {
               style={{ background: 'var(--card)', borderRadius: 16, padding: 16, display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 12 : 16, alignItems: isMobile ? 'stretch' : 'center', boxShadow: 'var(--shadow-sm)', border: 'var(--card-border)' }}
             >
               <div style={{ display: 'flex', gap: 16, alignItems: 'center', flex: 1, minWidth: 0 }}>
-                <div style={{ width: 80, height: 80, borderRadius: 12, flexShrink: 0, background: 'linear-gradient(135deg, var(--brand-soft), #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, overflow: 'hidden' }}>
+                <div style={{ width: 80, height: 80, borderRadius: 12, flexShrink: 0, background: 'linear-gradient(135deg, var(--brand-soft), #fbf3df)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, overflow: 'hidden' }}>
                   {item.imageUrl ? <img src={item.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : item.emoji}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>

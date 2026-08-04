@@ -392,7 +392,7 @@ export default function ProductFormTab({
             <div style={{ background: '#f8f9fb', borderRadius: 12, padding: 16, border: '1px dashed #e5e7eb' }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af', marginBottom: 10 }}>معاينة المنتج</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 56, height: 56, borderRadius: 12, background: 'linear-gradient(135deg, var(--brand-soft), #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>
+                <div style={{ width: 56, height: 56, borderRadius: 12, background: 'linear-gradient(135deg, var(--brand-soft), #fbf3df)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>
                   {form.emoji || '?'}
                 </div>
                 <div>

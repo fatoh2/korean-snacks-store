@@ -378,7 +378,7 @@ export default function ProductDetail() {
                   onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)'; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'; }}
                 >
-                  <div style={{ width: '100%', aspectRatio: '1', borderRadius: 10, background: 'linear-gradient(135deg, var(--brand-soft), #f0f4ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, marginBottom: 10, overflow: 'hidden' }}>
+                  <div style={{ width: '100%', aspectRatio: '1', borderRadius: 10, background: 'linear-gradient(135deg, var(--brand-soft), #fbf3df)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, marginBottom: 10, overflow: 'hidden' }}>
                     {p.imageUrl ? <img src={p.imageUrl} alt={productName(p, lang)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : p.emoji}
                   </div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', lineHeight: 1.35, marginBottom: 5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{productName(p, lang)}</div>
