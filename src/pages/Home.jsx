@@ -26,9 +26,9 @@ const CATEGORIES = [
 ];
 
 const FEATURES = [
-  { icon: '🐰', t1: 'feat2Title', t2: 'feat2Desc', color: 'var(--brand-blue)', bg: '#eff6ff' },
-  { icon: '⚡', t1: 'feat3Title', t2: 'feat3Desc', color: '#059669', bg: '#f0fdf4' },
-  { icon: '🔒', t1: 'feat4Title', t2: 'feat4Desc', color: '#d97706', bg: '#fffbeb' },
+  { icon: '✦', number: '01', t1: 'feat2Title', t2: 'feat2Desc' },
+  { icon: '↗', number: '02', t1: 'feat3Title', t2: 'feat3Desc' },
+  { icon: '◇', number: '03', t1: 'feat4Title', t2: 'feat4Desc' },
 ];
 
 export default function Home() {
@@ -103,22 +103,21 @@ export default function Home() {
       </div>
 
       {/* ── Features ── */}
-      <div style={{ background: 'var(--card)', padding: '52px 20px', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
+      <section className="home-services">
+        <div className="home-services__grid">
           {FEATURES.map(f => (
-            <div
-              key={f.t1}
-              style={{ display: 'flex', alignItems: 'flex-start', gap: 16, padding: '20px 18px', borderRadius: 16, background: f.bg, border: `1px solid ${f.color}22` }}
-            >
-              <div style={{ fontSize: 32, flexShrink: 0, lineHeight: 1 }}>{f.icon}</div>
-              <div>
-                <div style={{ fontWeight: 800, fontSize: 15, color: f.color, marginBottom: 5 }}>{t(f.t1)}</div>
-                <div style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.6 }}>{t(f.t2)}</div>
+            <article key={f.t1} className="home-service-card">
+              <div className="home-service-card__topline">
+                <span className="home-service-card__icon" aria-hidden="true">{f.icon}</span>
+                <span className="home-service-card__number">{f.number}</span>
               </div>
-            </div>
+              <h2 className="home-service-card__title">{t(f.t1)}</h2>
+              <p className="home-service-card__description">{t(f.t2)}</p>
+              <span className="home-service-card__rule" aria-hidden="true" />
+            </article>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* ── Best Sellers ── */}
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '64px 20px' }}>

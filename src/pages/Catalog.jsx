@@ -95,27 +95,35 @@ export default function Catalog() {
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '24px 20px' }}>
 
       {/* Hero */}
-      <div style={{
-        background: 'linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 50%, var(--brand-blue) 100%)',
-        borderRadius: 20, padding: '32px 40px', marginBottom: 32,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        overflow: 'hidden', position: 'relative',
-      }}>
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', fontWeight: 600, marginBottom: 6 }}>
+      <section className="catalog-hero">
+        <div className="catalog-hero__copy">
+          <div className="catalog-hero__eyebrow">
+            <span className="catalog-hero__eyebrow-line" />
             {t('catalogHeroBadge')}
           </div>
-          <h1 style={{ color: 'white', fontSize: 28, fontWeight: 800, margin: 0, lineHeight: 1.3 }}>
-            {t('catalogHeroTitle')}
-          </h1>
-          <p style={{ color: 'rgba(255,255,255,0.85)', margin: '8px 0 0', fontSize: 15 }}>
-            {products.length}{t('catalogHeroSubtitle')}
-          </p>
+          <h1 className="catalog-hero__title">{t('catalogHeroTitle')}</h1>
+          <div className="catalog-hero__meta">
+            <span className="catalog-hero__count">{products.length}+</span>
+            <span>{tr('نكهة ومنتج مميز', 'curated flavours & products', 'טעמים ומוצרים נבחרים')}</span>
+            <span className="catalog-hero__meta-dot" />
+            <span>{tr('توصيل حتى باب البيت', 'delivered to your door', 'משלוח עד הבית')}</span>
+          </div>
         </div>
-        <div style={{ fontSize: 80, opacity: 0.9 }}>🍜</div>
-        <div style={{ position: 'absolute', top: -20, left: -20, width: 120, height: 120, background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }} />
-        <div style={{ position: 'absolute', bottom: -30, left: 60, width: 160, height: 160, background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }} />
-      </div>
+
+        <div className="catalog-hero__showcase" aria-hidden="true">
+          <div className="catalog-hero__monogram">LT</div>
+          <div className="catalog-hero__seal">
+            <span>CURATED</span>
+            <img src="/logo-nobg.png" alt="" />
+            <span>WORLD FLAVOURS</span>
+          </div>
+          <span className="catalog-hero__snack catalog-hero__snack--one">🍜</span>
+          <span className="catalog-hero__snack catalog-hero__snack--two">🍡</span>
+          <span className="catalog-hero__snack catalog-hero__snack--three">🥤</span>
+        </div>
+
+        <div className="catalog-hero__edition" aria-hidden="true">LULU TOKKI · EST. 2026</div>
+      </section>
 
       {/* Search */}
       <div style={{ position: 'relative', marginBottom: 20 }}>
