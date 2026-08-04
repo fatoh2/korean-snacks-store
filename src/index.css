@@ -102,9 +102,9 @@ body {
 .catalog-hero {
   position: relative;
   isolation: isolate;
-  min-height: 360px;
-  margin-bottom: 36px;
-  padding: clamp(34px, 5vw, 64px);
+  min-height: 270px;
+  margin-bottom: 28px;
+  padding: clamp(28px, 3.5vw, 42px);
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
   align-items: center;
@@ -135,7 +135,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
   color: #9c6275;
   font-size: 12px;
   font-weight: 800;
@@ -152,7 +152,7 @@ body {
   max-width: 760px;
   margin: 0;
   color: #29201e;
-  font-size: clamp(30px, 4vw, 52px);
+  font-size: clamp(28px, 3.2vw, 43px);
   font-weight: 900;
   line-height: 1.3;
   letter-spacing: -0.035em;
@@ -164,7 +164,7 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 9px;
-  margin-top: 25px;
+  margin-top: 17px;
   color: #746864;
   font-size: 13px;
   font-weight: 650;
@@ -187,7 +187,7 @@ body {
 
 .catalog-hero__showcase {
   position: relative;
-  min-height: 260px;
+  min-height: 205px;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -220,9 +220,9 @@ body {
 .catalog-hero__seal {
   position: relative;
   z-index: 2;
-  width: 170px;
-  height: 205px;
-  padding: 14px 8px;
+  width: 140px;
+  height: 168px;
+  padding: 10px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -237,8 +237,8 @@ body {
 }
 
 .catalog-hero__seal img {
-  width: 125px;
-  height: 125px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
   filter: saturate(0.72) sepia(0.12);
 }
@@ -285,15 +285,15 @@ body {
 @media (max-width: 760px) {
   .catalog-hero {
     min-height: 0;
-    padding: 30px 24px 24px;
+    padding: 25px 22px 20px;
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 20px;
     border-radius: 24px;
   }
   .catalog-hero__title { font-size: clamp(27px, 8vw, 38px); }
-  .catalog-hero__showcase { min-height: 210px; transform: none; }
-  .catalog-hero__seal { width: 145px; height: 170px; }
-  .catalog-hero__seal img { width: 98px; height: 98px; }
+  .catalog-hero__showcase { min-height: 165px; transform: none; }
+  .catalog-hero__seal { width: 118px; height: 138px; }
+  .catalog-hero__seal img { width: 78px; height: 78px; }
   .catalog-hero__snack { width: 44px; height: 44px; font-size: 21px; }
   .catalog-hero__edition { display: none; }
 }
@@ -309,7 +309,7 @@ body {
 /* Home — premium service promises */
 .home-services {
   position: relative;
-  padding: 62px 20px;
+  padding: 34px 20px;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
   background: var(--card);
@@ -347,8 +347,8 @@ body {
 
 .home-service-card {
   position: relative;
-  min-height: 225px;
-  padding: 30px 32px 32px;
+  min-height: 160px;
+  padding: 22px 26px 24px;
   border-inline-end: 1px solid #e8ded8;
 }
 
@@ -358,12 +358,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 36px;
+  margin-bottom: 18px;
 }
 
 .home-service-card__icon {
-  width: 46px;
-  height: 46px;
+  width: 38px;
+  height: 38px;
   display: grid;
   place-items: center;
   color: #fff8f2;
@@ -371,7 +371,7 @@ body {
   background: #2b2523;
   box-shadow: 0 8px 20px rgba(43, 37, 35, 0.16);
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 20px;
+  font-size: 17px;
   line-height: 1;
 }
 
@@ -399,7 +399,7 @@ body {
 
 .home-service-card__rule {
   position: absolute;
-  inset-inline-start: 32px;
+  inset-inline-start: 26px;
   bottom: 0;
   width: 42px;
   height: 3px;
@@ -421,17 +421,17 @@ body {
 [data-theme="dark"] .home-service-card__description { color: #aa9c96; }
 
 @media (max-width: 760px) {
-  .home-services { padding: 40px 20px; }
+  .home-services { padding: 26px 20px; }
   .home-services__grid { grid-template-columns: 1fr; }
   .home-service-card {
-    min-height: 180px;
-    padding: 26px 26px 28px;
+    min-height: 140px;
+    padding: 20px 22px 22px;
     border-inline-end: 0;
     border-bottom: 1px solid #e8ded8;
   }
   .home-service-card:last-child { border-bottom: 0; }
-  .home-service-card__topline { margin-bottom: 24px; }
-  .home-service-card__rule { inset-inline-start: 26px; }
+  .home-service-card__topline { margin-bottom: 14px; }
+  .home-service-card__rule { inset-inline-start: 22px; }
   [data-theme="dark"] .home-service-card { border-bottom-color: #3a302d; }
 }
 
