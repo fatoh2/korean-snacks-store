@@ -7,6 +7,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { db } from '../firebase';
 import { collection, addDoc, doc, getDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
+import { calculateOrderTotals, isValidPhone } from '../utils/order';
 
 function Field({ label, required, error, children }) {
   return (
@@ -34,9 +35,7 @@ export default function Checkout() {
   const [promoError, setPromoError] = useState('');
   const [promoChecking, setPromoChecking] = useState(false);
 
-  const shipping = totalPrice >= 100 ? 0 : 15;
-  const discountAmt = appliedPromo ? +(totalPrice * appliedPromo.pct / 100).toFixed(2) : 0;
-  const total = totalPrice - discountAmt + shipping;
+  const { shipping, discount: discountAmt, total } = calculateOrderTotals(totalPrice, appliedPromo?.pct);
 
   const applyPromo = async () => {
     const code = promoInput.trim().toUpperCase();
@@ -73,7 +72,7 @@ export default function Checkout() {
     const e = {};
     if (!form.name.trim()) e.name = t('nameRequired');
     if (!form.phone.trim()) e.phone = t('phoneRequired');
-    else if (!/^[0-9+\s-]{7,15}$/.test(form.phone.trim())) e.phone = t('phoneInvalid');
+    else if (!isValidPhone(form.phone)) e.phone = t('phoneInvalid');
     if (!form.city.trim()) e.city = t('cityRequired');
     if (!form.street.trim()) e.street = t('streetRequired');
     return e;
@@ -164,6 +163,12 @@ export default function Checkout() {
       });
     } catch (e) {
       console.error('Failed to save order', e);
+      toast.error(tr(
+        'تعذر حفظ الطلب. لم يتم إرسال الطلب؛ يرجى المحاولة مرة أخرى.',
+        'The order could not be saved. Nothing was submitted; please try again.',
+        'לא ניתן היה לשמור את ההזמנה. ההזמנה לא נשלחה; נסו שוב.',
+      ), { style: { fontFamily: 'Cairo, sans-serif', direction: isRTL ? 'rtl' : 'ltr' } });
+      return;
     }
 
     window.open(`https://wa.me/972547639465?text=${encodeURIComponent(msg)}`, '_blank');

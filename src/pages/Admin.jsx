@@ -180,6 +180,7 @@ export default function Admin() {
 
       {tab === 'add' && (
         <ProductFormTab
+          key={`${editingId ?? 'new'}-${form.imageUrl || ''}`}
           products={products}
           editingId={editingId}
           setEditingId={setEditingId}

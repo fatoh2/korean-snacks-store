@@ -33,11 +33,6 @@ export default function ProductFormTab({
     }).catch(fallback);
   }, []);
 
-  useEffect(() => {
-    setImagePreview(form.imageUrl || '');
-    setImageFile(null);
-  }, [editingId, form.imageUrl]);
-
   const set = (field, val) => {
     setForm(f => ({ ...f, [field]: val }));
     if (errors[field]) setErrors(e => ({ ...e, [field]: '' }));

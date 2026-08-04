@@ -75,6 +75,13 @@ export default {
         headers: { ...headers, 'Content-Type': 'application/json' },
       });
     }
+    const maxUploadBytes = 5 * 1024 * 1024;
+    if (file.size > maxUploadBytes) {
+      return new Response(JSON.stringify({ error: 'Image exceeds the 5 MB limit' }), {
+        status: 413,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+      });
+    }
     if (typeof key !== 'string' || !/^product-images\/[a-zA-Z0-9_-]+$/.test(key)) {
       return new Response(JSON.stringify({ error: 'Invalid key' }), {
         status: 400,

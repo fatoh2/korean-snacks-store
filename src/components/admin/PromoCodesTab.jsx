@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, getDocs, setDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import toast from 'react-hot-toast';
-import { inputStyle, toastStyle } from './adminStyles';
+import { toastStyle } from './adminStyles';
 
 export default function PromoCodesTab() {
   const [promoCodes, setPromoCodes] = useState([]);

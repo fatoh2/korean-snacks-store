@@ -46,8 +46,8 @@ const T = {
     badgeFeatured: '⭐ مميز',
     badgeOutOfStock: 'نفد المخزون',
 
-    catalogHeroBadge: '🐰 أفضل المنتجات الكورية الأصيلة',
-    catalogHeroTitle: 'وجبات كورية في بيتك',
+    catalogHeroBadge: '🐰 عالم من أطيب النكهات العالمية',
+    catalogHeroTitle: 'تشكيلة مختارة بعناية من أطيب النكهات العالمية تصل لباب بيتك',
     catalogHeroSubtitle: '+ منتج أصيل يصلك على باب البيت',
     searchPlaceholder: 'ابحث عن منتج، علامة تجارية...',
     filterBtn: '⚙️ فلاتر',
