@@ -10,6 +10,24 @@ import toast from 'react-hot-toast';
 
 const HEAT_COLORS = ['', '#f59e0b', '#f97316', '#ef4444', '#dc2626', '#991b1b'];
 
+function ProductSpecs({ title, rows }) {
+  return (
+    <div style={{ borderRadius: 16, border: '1px solid var(--border)', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--muted-bg)', padding: '12px 16px', fontWeight: 800, fontSize: 14, color: 'var(--text)', borderBottom: '1px solid var(--border)' }}>{title}</div>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+        <tbody>
+          {rows.map(([label, value], i) => (
+            <tr key={label} style={{ background: i % 2 === 0 ? 'var(--card)' : 'var(--muted-bg)' }}>
+              <td style={{ padding: '9px 16px', fontWeight: 700, color: 'var(--subtext)', width: '40%', borderBottom: '1px solid var(--border)' }}>{label}</td>
+              <td style={{ padding: '9px 16px', color: 'var(--text)', fontWeight: 600, borderBottom: '1px solid var(--border)' }}>{value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 const GALLERY_BG = {
   رامن: [
     { decorEmoji: '', bg: 'linear-gradient(135deg, var(--brand-soft) 0%, #fce7f3 100%)' },
@@ -139,12 +157,21 @@ export default function ProductDetail() {
   );
 
   const related = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+  const specRows = [
+    [t('specWeight'), product.weight],
+    [t('specServings'), product.servings],
+    [t('specOrigin'), product.origin],
+    [t('specBrand'), product.brand],
+    [t('specCategory'), product.category],
+    ...(product.heat > 0 ? [[t('specHeat'), `${product.heat}/5 — ${heatLabels[product.heat]}`]] : []),
+    [t('specAvailability'), product.inStock ? t('specAvailable') : t('specOutOfStock')],
+  ].filter(([, value]) => value !== undefined && value !== null && value !== '');
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '28px 20px' }}>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 20px 36px' }}>
 
       {/* Breadcrumb */}
-      <nav style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#9ca3af', marginBottom: 24, flexWrap: 'wrap' }}>
+      <nav style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#9ca3af', marginBottom: 18, flexWrap: 'wrap' }}>
         <Link to="/store" style={{ color: '#6b7280', textDecoration: 'none', fontWeight: 600 }}>{t('storeLink')}</Link>
         <span>›</span>
         <button
@@ -160,11 +187,11 @@ export default function ProductDetail() {
       </nav>
 
       {/* Main Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 24 : 48, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 24 : 32, alignItems: 'start' }}>
 
         {/* Gallery */}
-        <div>
-          <div style={{ borderRadius: 20, background: productView.bg, height: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ borderRadius: 20, background: productView.bg, height: isMobile ? 340 : 360, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)' }}>
             {product.imageUrl ? (
               <img src={product.imageUrl} alt={productName(product, lang)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             ) : (
@@ -184,6 +211,7 @@ export default function ProductDetail() {
               {product.isFeatured && <span style={{ background: 'var(--brand)', color: 'white', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 8 }}>{t('badgeFeatured')}</span>}
             </div>
           </div>
+          {!isMobile && <ProductSpecs title={t('specsTitle')} rows={specRows} />}
         </div>
 
         {/* Product Info */}
@@ -303,34 +331,13 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          {/* Specs table */}
-          <div style={{ borderRadius: 16, border: '1px solid var(--border)', overflow: 'hidden' }}>
-            <div style={{ background: 'var(--muted-bg)', padding: '12px 16px', fontWeight: 800, fontSize: 14, color: 'var(--text)', borderBottom: '1px solid var(--border)' }}>{t('specsTitle')}</div>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
-              <tbody>
-                {[
-                  [t('specWeight'), product.weight],
-                  [t('specServings'), product.servings],
-                  [t('specOrigin'), product.origin],
-                  [t('specBrand'), product.brand],
-                  [t('specCategory'), product.category],
-                  ...(product.heat > 0 ? [[t('specHeat'), `${product.heat}/5 — ${heatLabels[product.heat]}`]] : []),
-                  [t('specAvailability'), product.inStock ? t('specAvailable') : t('specOutOfStock')],
-                ].map(([label, value], i) => (
-                  <tr key={label} style={{ background: i % 2 === 0 ? 'var(--card)' : 'var(--muted-bg)' }}>
-                    <td style={{ padding: '10px 16px', fontWeight: 700, color: 'var(--subtext)', width: '40%', borderBottom: '1px solid var(--border)' }}>{label}</td>
-                    <td style={{ padding: '10px 16px', color: 'var(--text)', fontWeight: 600, borderBottom: '1px solid var(--border)' }}>{value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {isMobile && <ProductSpecs title={t('specsTitle')} rows={specRows} />}
         </div>
       </div>
 
       {/* Related Products */}
       {related.length > 0 && (
-        <div style={{ marginTop: 60 }}>
+        <div style={{ marginTop: 36 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <h2 style={{ fontWeight: 800, fontSize: 20, color: 'var(--text)', margin: 0 }}>{relatedTitle}</h2>
             <Link to="/store" style={{ color: 'var(--brand)', textDecoration: 'none', fontWeight: 700, fontSize: 14 }}>
