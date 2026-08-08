@@ -11,6 +11,8 @@ const CAT_META = {
   'حلوى':    { icon: 'candy', en: 'Candy',    he: 'ממתקים',     gradient: 'linear-gradient(135deg,#b8647d 0%,#754153 100%)' },
   'مشروبات': { icon: 'drinks', en: 'Drinks',   he: 'משקאות',     gradient: 'linear-gradient(135deg,#8d6f65 0%,#4d3b36 100%)' },
   'بسكويت':  { icon: 'biscuits', en: 'Biscuits', he: 'ביסקוויטים', gradient: 'linear-gradient(135deg,#c2a060 0%,#74582c 100%)' },
+  'كاندي':   { icon: 'kandy', en: 'Candy', he: 'קנדי', gradient: 'linear-gradient(135deg,#b8647d 0%,#754153 100%)' },
+  'مجّات':   { icon: 'mugs', en: 'Mugs', he: 'ספלים', gradient: 'linear-gradient(135deg,#b8944f 0%,#6f552b 100%)' },
 };
 
 const SORT_OPTIONS_AR = [

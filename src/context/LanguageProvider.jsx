@@ -38,6 +38,8 @@ const T = {
     catCandy: 'حلوى',
     catDrinks: 'مشروبات',
     catBiscuits: 'بسكويت',
+    catKandy: 'كاندي',
+    catMugs: 'مجّات',
 
     addToCart: '+ أضف للسلة',
     inCart: '✓ في السلة',
@@ -229,6 +231,8 @@ const T = {
     catCandy: 'ממתקים',
     catDrinks: 'משקאות',
     catBiscuits: 'ביסקוויטים',
+    catKandy: 'קנדי',
+    catMugs: 'ספלים',
 
     addToCart: '+ הוספה לעגלה',
     inCart: '✓ בעגלה',
@@ -420,6 +424,8 @@ const T = {
     catCandy: 'Candy',
     catDrinks: 'Drinks',
     catBiscuits: 'Biscuits',
+    catKandy: 'Candy',
+    catMugs: 'Mugs',
 
     addToCart: '+ Add to Cart',
     inCart: '✓ In Cart',

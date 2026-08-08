@@ -6,7 +6,7 @@ import ProductCard from '../components/ProductCard';
 import Pagination from '../components/Pagination';
 import CategoryIcon from '../components/CategoryIcon';
 
-const CATEGORIES = ['الكل', 'رامن', 'رقائق', 'حلوى', 'مشروبات', 'بسكويت'];
+const CATEGORIES = ['الكل', 'رامن', 'رقائق', 'حلوى', 'مشروبات', 'بسكويت', 'كاندي', 'مجّات'];
 const PAGE_SIZE = 20;
 
 export default function Catalog() {
@@ -34,6 +34,7 @@ export default function Catalog() {
   const catLabel = (cat) => ({
     'الكل': t('catAll'), 'رامن': t('catRamen'), 'رقائق': t('catChips'),
     'حلوى': t('catCandy'), 'مشروبات': t('catDrinks'), 'بسكويت': t('catBiscuits'),
+    'كاندي': t('catKandy'), 'مجّات': t('catMugs'),
   })[cat] ?? cat;
 
   const maxPriceInData = Math.ceil(Math.max(...products.map(p => p.price))) + 1;

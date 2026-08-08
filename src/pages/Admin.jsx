@@ -11,6 +11,13 @@ import OrdersTab from '../components/admin/OrdersTab';
 import AnalyticsTab from '../components/admin/AnalyticsTab';
 import CustomersTab from '../components/admin/CustomersTab';
 
+const DEFAULT_ADMIN_CATEGORIES = [
+  { name: 'رامن', emoji: '🍜' }, { name: 'رقائق', emoji: '🍟' },
+  { name: 'حلوى', emoji: '🍬' }, { name: 'مشروبات', emoji: '🧃' },
+  { name: 'بسكويت', emoji: '🍪' }, { name: 'كاندي', emoji: '🍭' },
+  { name: 'مجّات', emoji: '☕' },
+];
+
 export default function Admin() {
   const { products, addProduct, removeProduct, updateProduct, seedProducts } = useProducts();
   const [tab, setTab] = useState('list');
@@ -26,17 +33,16 @@ export default function Admin() {
   const [ordersLoaded, setOrdersLoaded] = useState(false);
 
   // Categories for product list
-  const [categories, setCategories] = useState([
-    { name: 'رامن', emoji: '🍜' }, { name: 'رقائق', emoji: '🍟' },
-    { name: 'حلوى', emoji: '🍬' }, { name: 'مشروبات', emoji: '🧃' },
-    { name: 'بسكويت', emoji: '🍪' },
-  ]);
+  const [categories, setCategories] = useState(DEFAULT_ADMIN_CATEGORIES);
 
   useEffect(() => {
     getDocs(collection(db, 'categories')).then(snap => {
       const arr = [];
       snap.forEach(d => arr.push({ name: d.id, ...d.data() }));
       if (arr.length) {
+        DEFAULT_ADMIN_CATEGORIES.forEach(defaultCategory => {
+          if (!arr.some(category => category.name === defaultCategory.name)) arr.push(defaultCategory);
+        });
         arr.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
         setCategories(arr);
       }

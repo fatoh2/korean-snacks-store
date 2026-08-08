@@ -10,6 +10,8 @@ const DEFAULT_CATEGORIES = [
   { name: 'حلوى', emoji: '🍬', sortOrder: 2 },
   { name: 'مشروبات', emoji: '🧃', sortOrder: 3 },
   { name: 'بسكويت', emoji: '🍪', sortOrder: 4 },
+  { name: 'كاندي', emoji: '🍭', sortOrder: 5 },
+  { name: 'مجّات', emoji: '☕', sortOrder: 6 },
 ];
 
 export default function CategoryManager() {
@@ -25,6 +27,17 @@ export default function CategoryManager() {
       const snap = await getDocs(collection(db, 'categories'));
       const arr = [];
       snap.forEach(d => arr.push({ name: d.id, ...d.data() }));
+      const missingCategories = DEFAULT_CATEGORIES.filter(
+        defaultCategory => !arr.some(category => category.name === defaultCategory.name),
+      );
+      if (arr.length > 0 && missingCategories.length > 0) {
+        const batch = writeBatch(db);
+        missingCategories.forEach(category => {
+          batch.set(doc(db, 'categories', category.name), { emoji: category.emoji, sortOrder: category.sortOrder });
+          arr.push(category);
+        });
+        await batch.commit();
+      }
       arr.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
       if (active) {
         if (arr.length === 0) {

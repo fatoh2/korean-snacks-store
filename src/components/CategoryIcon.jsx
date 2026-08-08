@@ -2,6 +2,8 @@ const ICON_PATHS = {
   ramen: <><path d="M7 10h18l-1.3 7.2A7 7 0 0 1 16.8 23h-1.6a7 7 0 0 1-6.9-5.8L7 10Z" /><path d="M5 10h22M10 26h12M11 5c0 2 2 2 2 4M16 4c0 2 2 2 2 4M21 5c0 2 2 2 2 4" /></>,
   chips: <><path d="m9 5 14 1 2 20H7L9 5Z" /><path d="M10 10c4 1 8 1 14 0M10 21c4-1 8-1 14 0" /><path d="M13 15c2-3 5-2 6 0-1 3-4 4-6 0Z" /></>,
   candy: <><path d="M11 11c3-3 7-3 10 0s3 7 0 10-7 3-10 0-3-7 0-10Z" /><path d="m10 12-5-2 2 6-2 6 6-2M22 12l5-2-2 6 2 6-6-2" /></>,
+  kandy: <><path d="M9 7h14l-2 19H11L9 7Z" /><path d="m10 11 12-2M11 21l10-2M13 14l6 5M19 13l-6 7" /></>,
+  mugs: <><path d="M7 9h15v10a7 7 0 0 1-7 7h-1a7 7 0 0 1-7-7V9Z" /><path d="M22 12h2a4 4 0 0 1 0 8h-2M11 5c0 1.5 1.5 1.5 1.5 3M16 4c0 1.5 1.5 1.5 1.5 3" /></>,
   drinks: <><path d="M10 9h13l-1 17H11L10 9Z" /><path d="M9 9h15M17 9l2-5h5M13 14h7M14 18h5" /></>,
   biscuits: <><circle cx="16" cy="16" r="10" /><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" /><circle cx="20" cy="13" r="1" fill="currentColor" stroke="none" /><circle cx="13" cy="20" r="1" fill="currentColor" stroke="none" /><circle cx="20" cy="20" r="1" fill="currentColor" stroke="none" /></>,
   all: <><path d="M6 12 16 6l10 6v12H6V12Z" /><path d="M11 24v-7h10v7M12 11h8" /></>,

@@ -23,11 +23,15 @@ export default function ProductFormTab({
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    const fallback = () => setCategories([{ name: 'رامن' }, { name: 'رقائق' }, { name: 'حلوى' }, { name: 'مشروبات' }, { name: 'بسكويت' }]);
+    const defaults = [{ name: 'رامن' }, { name: 'رقائق' }, { name: 'حلوى' }, { name: 'مشروبات' }, { name: 'بسكويت' }, { name: 'كاندي' }, { name: 'مجّات' }];
+    const fallback = () => setCategories(defaults);
     getDocs(collection(db, 'categories')).then(snap => {
       const arr = [];
       snap.forEach(d => arr.push({ name: d.id, ...d.data() }));
       arr.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+      defaults.forEach(defaultCategory => {
+        if (!arr.some(category => category.name === defaultCategory.name)) arr.push(defaultCategory);
+      });
       if (arr.length) setCategories(arr);
       else fallback();
     }).catch(fallback);

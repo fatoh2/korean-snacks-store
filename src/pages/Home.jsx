@@ -24,6 +24,8 @@ const CATEGORIES = [
   { key: 'حلوى', icon: 'candy', tKey: 'catCandy' },
   { key: 'مشروبات', icon: 'drinks', tKey: 'catDrinks' },
   { key: 'بسكويت', icon: 'biscuits', tKey: 'catBiscuits' },
+  { key: 'كاندي', icon: 'kandy', tKey: 'catKandy' },
+  { key: 'مجّات', icon: 'mugs', tKey: 'catMugs' },
 ];
 
 const FEATURES = [
@@ -90,7 +92,7 @@ export default function Home() {
           <div style={{ display: 'flex', gap: 36, justifyContent: 'center', marginTop: 38, flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: 26 }}>
             {[
               { num: `${products.length}+`, label: t('heroStatProducts') },
-              { num: '5', label: t('heroStatCategories') },
+              { num: String(CATEGORIES.length), label: t('heroStatCategories') },
               { num: '100%', label: t('heroStatAuthentic') },
               { num: '⚡', label: t('heroStatDelivery') },
             ].map(stat => (

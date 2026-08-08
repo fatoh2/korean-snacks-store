@@ -49,7 +49,6 @@ export default function ProductDetail() {
   const { products } = useProducts();
   const { addItem, items, updateQty } = useCart();
   const { t, tr, isRTL, lang } = useLanguage();
-  const [activePhoto, setActivePhoto] = useState(0);
   const [qty, setQty] = useState(1);
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0);
   const isMobile = useIsMobile();
@@ -85,9 +84,8 @@ export default function ProductDetail() {
     );
   }
 
-  const galleryLabels = (t('galleryViews')[product.category] ?? t('galleryViews')['رامن']);
   const galleryBg = GALLERY_BG[product.category] ?? GALLERY_BG['رامن'];
-  const views = galleryBg.map((v, i) => ({ ...v, label: galleryLabels[i] }));
+  const productView = galleryBg[0];
   const heatLabels = t('heatLabels');
   const inCart = items.find(i => i.id === product.id);
   const outOfStock = !product.inStock || product.stock === 0;
@@ -166,8 +164,8 @@ export default function ProductDetail() {
 
         {/* Gallery */}
         <div>
-          <div style={{ borderRadius: 20, background: views[activePhoto].bg, height: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)', marginBottom: 12 }}>
-            {product.imageUrl && activePhoto === 0 ? (
+          <div style={{ borderRadius: 20, background: productView.bg, height: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.06)' }}>
+            {product.imageUrl ? (
               <img src={product.imageUrl} alt={productName(product, lang)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             ) : (
               <>
@@ -175,32 +173,16 @@ export default function ProductDetail() {
                 <div style={{ position: 'absolute', bottom: -40, right: -20, width: 180, height: 180, background: 'rgba(255,255,255,0.3)', borderRadius: '50%' }} />
                 <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
                   <div style={{ fontSize: 120, lineHeight: 1, filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.12))' }}>{product.emoji}</div>
-                  {views[activePhoto].decorEmoji && (
-                    <div style={{ position: 'absolute', bottom: -20, left: -30, fontSize: 48, opacity: 0.6 }}>{views[activePhoto].decorEmoji}</div>
+                  {productView.decorEmoji && (
+                    <div style={{ position: 'absolute', bottom: -20, left: -30, fontSize: 48, opacity: 0.6 }}>{productView.decorEmoji}</div>
                   )}
                 </div>
               </>
             )}
-            <div style={{ position: 'absolute', bottom: 16, right: 16, background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(4px)', borderRadius: 8, padding: '4px 12px', fontSize: 12, fontWeight: 700, color: '#374151' }}>
-              {views[activePhoto].label}
-            </div>
             <div style={{ position: 'absolute', top: 16, right: 16, display: 'flex', gap: 6 }}>
               {product.isNew && <span style={{ background: 'var(--brand-blue)', color: 'white', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 8 }}>{t('badgeNew')}</span>}
               {product.isFeatured && <span style={{ background: 'var(--brand)', color: 'white', fontSize: 12, fontWeight: 700, padding: '4px 10px', borderRadius: 8 }}>{t('badgeFeatured')}</span>}
             </div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-            {views.map((view, i) => (
-              <button key={i} onClick={() => setActivePhoto(i)} style={{ borderRadius: 12, background: view.bg, height: 80, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, border: `2px solid ${activePhoto === i ? 'var(--brand)' : 'transparent'}`, cursor: 'pointer', transition: 'all 0.2s', outline: 'none', boxShadow: activePhoto === i ? '0 0 0 3px rgba(232,138,166,0.15)' : 'none', overflow: 'hidden', padding: 0, position: 'relative' }}>
-                {product.imageUrl && i === 0
-                  ? <img src={product.imageUrl} alt={productName(product, lang)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : <>
-                      <span style={{ fontSize: 28 }}>{product.emoji}</span>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: activePhoto === i ? 'var(--brand)' : '#6b7280' }}>{view.label}</span>
-                    </>
-                }
-              </button>
-            ))}
           </div>
         </div>
 
