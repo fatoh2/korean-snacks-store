@@ -4,6 +4,7 @@ import { db } from '../../firebase';
 import toast from 'react-hot-toast';
 import AdminBadge from './AdminBadge';
 import { ORDER_STATUS, inputStyle, toastStyle } from './adminStyles';
+import { normalizeWhatsAppPhone } from '../../utils/order';
 
 export default function OrdersTab({ orders, setOrders, loading, loaded }) {
   const [filter, setFilter] = useState('all');
@@ -75,7 +76,11 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
   };
 
   const openWhatsApp = (order) => {
-    const phone = (order.phone || '').replace(/[^0-9]/g, '');
+    const phone = normalizeWhatsAppPhone(order.phone);
+    if (!phone) {
+      toast.error('رقم الهاتف غير صالح', { style: toastStyle });
+      return;
+    }
     const items = (order.items || []).map(i => `• ${i.emoji || ''} ${i.name} × ${i.quantity}`).join('\n');
     const msg = `مرحباً ${order.customerName || ''},\n\nتفاصيل طلبك من Lulu Tokki:\n${items}\n\nالمجموع: ${(order.total || 0).toFixed(2)} ₪\nالحالة: ${ORDER_STATUS[order.status || 'pending']?.label || order.status}\n\nشكراً لتسوقك معنا! 🐰`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -83,7 +88,7 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
 
   const printOrder = (order) => {
     const items = (order.items || []).map(i =>
-      `<tr><td style="padding:6px 10px;border-bottom:1px solid #eee">${i.emoji || ''} ${i.name}</td><td style="padding:6px 10px;border-bottom:1px solid #eee;text-align:center">${i.quantity}</td><td style="padding:6px 10px;border-bottom:1px solid #eee;text-align:left">${((i.price || 0) * i.quantity).toFixed(2)} ₪</td></tr>`
+      `<tr><td style="padding:6px 10px;border-bottom:1px solid #eee"><div style="display:flex;align-items:center;gap:8px">${i.imageUrl ? `<img src="${i.imageUrl}" alt="" style="width:38px;height:38px;object-fit:cover;border-radius:6px">` : `<span>${i.emoji || '🛍️'}</span>`}<span>${i.name}${i.variant ? `<small style="display:block;color:#777">${i.variant}</small>` : ''}</span></div></td><td style="padding:6px 10px;border-bottom:1px solid #eee;text-align:center">${i.quantity}</td><td style="padding:6px 10px;border-bottom:1px solid #eee;text-align:left">${((i.price || 0) * i.quantity).toFixed(2)} ₪</td></tr>`
     ).join('');
     const html = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>فاتورة #${order.id?.slice(0, 8)}</title><style>body{font-family:Cairo,Tahoma,sans-serif;padding:30px;max-width:400px;margin:0 auto;color:#1a1a2e}h2{text-align:center;margin:0}table{width:100%;border-collapse:collapse;margin:16px 0}th{background:#f8f9fb;padding:8px 10px;font-size:13px;text-align:right}td{font-size:13px}.total{font-size:18px;font-weight:800;text-align:center;margin:16px 0;color:#e88aa6}.footer{text-align:center;font-size:12px;color:#9ca3af;margin-top:24px;border-top:1px solid #eee;padding-top:12px}</style></head><body>
     <h2>🐰 Lulu Tokki</h2>
@@ -99,7 +104,7 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
     <div style="font-size:13px;padding:8px 0;border-top:2px solid #f3f4f6">
       <div style="display:flex;justify-content:space-between"><span>المجموع الفرعي</span><span>${(order.subtotal || 0).toFixed(2)} ₪</span></div>
       ${(order.discount || 0) > 0 ? `<div style="display:flex;justify-content:space-between;color:#16a34a"><span>الخصم</span><span>-${order.discount.toFixed(2)} ₪</span></div>` : ''}
-      <div style="display:flex;justify-content:space-between"><span>الشحن</span><span>${(order.shipping || 0) === 0 ? 'مجاني' : `${(order.shipping || 0).toFixed(2)} ₪`}</span></div>
+      <div style="display:flex;justify-content:space-between"><span>الشحن</span><span>${(order.shipping || 0).toFixed(2)} ₪</span></div>
     </div>
     <div class="total">الإجمالي: ${(order.total || 0).toFixed(2)} ₪</div>
     <div class="footer">شكراً لتسوقك مع Lulu Tokki 🐰<br/>باقة الغربية</div>
@@ -186,6 +191,10 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
             const sc = ORDER_STATUS[status] || ORDER_STATUS.pending;
             const isExpanded = expanded === order.id;
             const repeatCount = customerCounts[order.phone || order.userId || ''] || 0;
+            const fullAddress = order.address
+              ? [order.address.city, order.address.district, order.address.street, order.address.building].filter(Boolean).join('، ')
+              : '';
+            const orderDate = order.date ? new Date(order.date) : null;
             return (
               <div key={order.id} style={{ background: 'white', borderRadius: 16, border: selectedIds.has(order.id) ? '2px solid var(--brand)' : '1px solid #f0f0f0', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
                 <div style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
@@ -204,21 +213,79 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
                 </div>
 
                 {isExpanded && (
-                  <div style={{ borderTop: '1px solid #f3f4f6', padding: '14px 18px' }}>
+                  <div style={{ borderTop: '1px solid var(--border)', padding: '20px 18px', background: 'var(--bg)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 12, marginBottom: 18 }}>
+                      <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: 14 }}>
+                        <div style={{ fontWeight: 800, fontSize: 13, color: 'var(--brand)', marginBottom: 10 }}>👤 بيانات الزبون</div>
+                        <div style={{ display: 'grid', gap: 6, fontSize: 13, color: 'var(--text)' }}>
+                          <div><b>الاسم:</b> {order.customerName || 'غير مسجل'}</div>
+                          <div><b>الهاتف:</b> <span dir="ltr">{order.phone || 'غير مسجل'}</span></div>
+                          <div><b>معرّف المستخدم:</b> <span dir="ltr" style={{ fontSize: 11, wordBreak: 'break-all', color: 'var(--subtext)' }}>{order.userId || 'طلب ضيف'}</span></div>
+                          {repeatCount > 1 && <div><b>عدد الطلبات:</b> {repeatCount}</div>}
+                        </div>
+                      </div>
+                      <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: 14 }}>
+                        <div style={{ fontWeight: 800, fontSize: 13, color: 'var(--brand)', marginBottom: 10 }}>📍 عنوان التوصيل</div>
+                        <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.8 }}>{fullAddress || 'لم يُسجّل عنوان'}</div>
+                        {order.address && (
+                          <div style={{ marginTop: 6, fontSize: 11, color: 'var(--subtext)' }}>
+                            المدينة: {order.address.city || '—'} · الحي: {order.address.district || '—'} · الشارع: {order.address.street || '—'} · المبنى: {order.address.building || '—'}
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: 14 }}>
+                        <div style={{ fontWeight: 800, fontSize: 13, color: 'var(--brand)', marginBottom: 10 }}>🧾 بيانات الطلب</div>
+                        <div style={{ display: 'grid', gap: 6, fontSize: 13, color: 'var(--text)' }}>
+                          <div><b>رقم الطلب:</b> <span dir="ltr" style={{ fontSize: 11, wordBreak: 'break-all' }}>{order.id}</span></div>
+                          <div><b>التاريخ:</b> {orderDate && !Number.isNaN(orderDate.getTime()) ? orderDate.toLocaleString('ar-IL', { dateStyle: 'full', timeStyle: 'short' }) : 'غير مسجل'}</div>
+                          <div><b>الحالة:</b> {sc.icon} {sc.label}</div>
+                          <div><b>عدد المنتجات:</b> {(order.items || []).reduce((sum, item) => sum + (item.quantity || 0), 0)}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text)', marginBottom: 10 }}>🛍️ المنتجات المطلوبة</div>
+                    <div style={{ display: 'grid', gap: 10 }}>
                     {(order.items || []).map((item, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: i < (order.items.length - 1) ? '1px solid #f9fafb' : 'none' }}>
-                        <span style={{ fontSize: 20 }}>{item.emoji || '🛍️'}</span>
-                        <span style={{ flex: 1, fontSize: 13, color: '#374151', fontWeight: 600 }}>{item.name}</span>
-                        {item.variant && <span style={{ fontSize: 11, color: '#6b7280', background: '#f3f4f6', padding: '1px 7px', borderRadius: 5 }}>{item.variant}</span>}
-                        <span style={{ fontSize: 12, color: '#9ca3af' }}>× {item.quantity}</span>
-                        <span style={{ fontWeight: 700, fontSize: 13, color: '#1a1a2e' }}>{((item.price || 0) * item.quantity).toFixed(2)} ₪</span>
+                      <div key={`${item.id || 'item'}-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: 12, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12 }}>
+                        <div style={{ width: 72, height: 72, flexShrink: 0, borderRadius: 10, overflow: 'hidden', display: 'grid', placeItems: 'center', background: 'linear-gradient(135deg, var(--brand-soft), #fbf3df)', fontSize: 30 }}>
+                          {item.imageUrl
+                            ? <img src={item.imageUrl} alt={item.name || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            : (item.emoji || '🛍️')}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 14, color: 'var(--text)', fontWeight: 800 }}>{item.name || 'منتج بدون اسم'}</div>
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 5, fontSize: 11, color: 'var(--subtext)' }}>
+                            <span>رقم المنتج: {item.id ?? '—'}</span>
+                            {item.variant && <span style={{ background: 'var(--muted-bg)', padding: '1px 7px', borderRadius: 5 }}>الخيار: {item.variant}</span>}
+                            <span>سعر الوحدة: {(item.price || 0).toFixed(2)} ₪</span>
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'center', minWidth: 64 }}>
+                          <div style={{ fontSize: 12, color: 'var(--subtext)' }}>الكمية</div>
+                          <div style={{ fontWeight: 900, fontSize: 17, color: 'var(--text)' }}>× {item.quantity || 0}</div>
+                        </div>
+                        <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--brand)', minWidth: 82, textAlign: 'end' }}>{((item.price || 0) * (item.quantity || 0)).toFixed(2)} ₪</div>
                       </div>
                     ))}
-                    <div style={{ display: 'flex', gap: 20, fontSize: 13, color: '#6b7280', margin: '12px 0', flexWrap: 'wrap' }}>
-                      <span>مجموع: <b style={{ color: '#1a1a2e' }}>{(order.subtotal || 0).toFixed(2)} ₪</b></span>
-                      {(order.discount || 0) > 0 && <span>خصم: <b style={{ color: '#16a34a' }}>-{order.discount.toFixed(2)} ₪</b></span>}
-                      <span>شحن: <b style={{ color: '#1a1a2e' }}>{(order.shipping || 0) === 0 ? 'مجاني 🎉' : `${(order.shipping || 0).toFixed(2)} ₪`}</b></span>
-                      {order.notes && <span>ملاحظات: <b style={{ color: '#374151' }}>{order.notes}</b></span>}
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12, margin: '16px 0' }}>
+                      <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: 14 }}>
+                        <div style={{ fontWeight: 800, fontSize: 13, color: 'var(--brand)', marginBottom: 8 }}>💰 ملخص الدفع</div>
+                        <div style={{ display: 'grid', gap: 6, fontSize: 13, color: 'var(--subtext)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>المجموع الفرعي</span><b style={{ color: 'var(--text)' }}>{(order.subtotal || 0).toFixed(2)} ₪</b></div>
+                          {(order.discount || 0) > 0 && <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>الخصم</span><b style={{ color: '#16a34a' }}>-{order.discount.toFixed(2)} ₪</b></div>}
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>الشحن</span><b style={{ color: 'var(--text)' }}>{(order.shipping || 0).toFixed(2)} ₪</b></div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border)', paddingTop: 7, fontSize: 15 }}><span style={{ fontWeight: 800, color: 'var(--text)' }}>الإجمالي</span><b style={{ color: 'var(--brand)' }}>{(order.total || 0).toFixed(2)} ₪</b></div>
+                          <div><b>كود الخصم:</b> {order.promoCode || 'لا يوجد'}</div>
+                          <div><b>طريقة الدفع:</b> الدفع عند الاستلام</div>
+                        </div>
+                      </div>
+                      <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: 14 }}>
+                        <div style={{ fontWeight: 800, fontSize: 13, color: 'var(--brand)', marginBottom: 8 }}>📝 ملاحظات الطلب</div>
+                        <div style={{ fontSize: 13, color: order.notes ? 'var(--text)' : 'var(--muted)', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>{order.notes || 'لا توجد ملاحظات'}</div>
+                      </div>
                     </div>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       {sc.next && (

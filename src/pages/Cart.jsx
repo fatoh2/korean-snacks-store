@@ -25,13 +25,8 @@ export default function Cart() {
     );
   }
 
-  const shipping = totalPrice >= 100 ? 0 : 15;
+  const shipping = 15;
   const total = totalPrice + shipping;
-  const nudge = tr(
-    `💡 أضف ${(100 - totalPrice).toFixed(2)} ₪ للحصول على شحن مجاني!`,
-    `💡 Add ₪${(100 - totalPrice).toFixed(2)} more for free shipping!`,
-    `💡 הוסיפו עוד ₪${(100 - totalPrice).toFixed(2)} כדי לקבל משלוח חינם!`,
-  );
   const itemsText = tr(
     `${items.length} ${items.length === 1 ? 'منتج' : 'منتجات'} في سلتك`,
     `${items.length} ${items.length === 1 ? 'item' : 'items'} in your cart`,
@@ -107,15 +102,8 @@ export default function Cart() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: 'var(--subtext)' }}>
               <span>{t('shippingFee')}</span>
-              <span style={{ fontWeight: 700, color: shipping === 0 ? '#16a34a' : '#1a1a2e' }}>
-                {shipping === 0 ? t('freeShippingLabel') : `${shipping.toFixed(2)} ${t('currency')}`}
-              </span>
+              <span style={{ fontWeight: 700, color: '#1a1a2e' }}>{shipping.toFixed(2)} {t('currency')}</span>
             </div>
-            {shipping > 0 && (
-              <div style={{ background: '#fffbeb', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#d97706', fontWeight: 600 }}>
-                {nudge}
-              </div>
-            )}
             <div style={{ borderTop: '2px solid var(--border)', paddingTop: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 800 }}>
                 <span style={{ color: 'var(--text)' }}>{t('totalLabel')}</span>

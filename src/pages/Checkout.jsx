@@ -89,9 +89,7 @@ export default function Checkout() {
 
     const sep = '━━━━━━━━━━━━━━━';
     const itemLines = items.map(item => `• ${item.name} × ${item.quantity} — ₪${(item.price * item.quantity).toFixed(2)}`).join('\n');
-    const shippingText = shipping === 0
-      ? tr('مجاني 🎉', 'Free 🎉', 'חינם 🎉')
-      : `₪${shipping.toFixed(2)}`;
+    const shippingText = `₪${shipping.toFixed(2)}`;
     const addressParts = [form.city, form.district, form.street, form.building].filter(Boolean).join(', ');
 
     const msg = tr(
@@ -145,6 +143,11 @@ export default function Checkout() {
       ].filter(line => line !== '').join('\n'),
     );
 
+    // Reserve the tab while the submit event still has a user gesture.
+    // Opening it after the Firestore await is commonly blocked as a popup.
+    const whatsappWindow = window.open('', '_blank');
+    if (whatsappWindow) whatsappWindow.opener = null;
+
     try {
       await addDoc(collection(db, 'orders'), {
         userId: user?.id || null,
@@ -162,6 +165,7 @@ export default function Checkout() {
         date: new Date().toISOString(),
       });
     } catch (e) {
+      whatsappWindow?.close();
       console.error('Failed to save order', e);
       toast.error(tr(
         'تعذر حفظ الطلب. لم يتم إرسال الطلب؛ يرجى المحاولة مرة أخرى.',
@@ -171,7 +175,13 @@ export default function Checkout() {
       return;
     }
 
-    window.open(`https://wa.me/972547639465?text=${encodeURIComponent(msg)}`, '_blank');
+    const whatsappUrl = `https://wa.me/972547639465?text=${encodeURIComponent(msg)}`;
+    if (whatsappWindow) {
+      whatsappWindow.location.href = whatsappUrl;
+    } else {
+      // Same-tab navigation is not subject to popup blocking.
+      window.location.assign(whatsappUrl);
+    }
     setSubmittedOrder({
       items: [...items],
       subtotal: totalPrice,
@@ -252,9 +262,7 @@ export default function Checkout() {
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: 'var(--subtext)' }}>
                 <span>{t('shippingLabel')}</span>
-                <span style={{ fontWeight: 700, color: o.shipping === 0 ? '#16a34a' : 'var(--text)' }}>
-                  {o.shipping === 0 ? t('freeLabel') : `${o.shipping.toFixed(2)} ${t('currency')}`}
-                </span>
+                <span style={{ fontWeight: 700, color: 'var(--text)' }}>{o.shipping.toFixed(2)} {t('currency')}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, fontWeight: 800, color: 'var(--text)', marginTop: 4 }}>
                 <span>{t('totalLabel')}</span>
@@ -411,9 +419,7 @@ export default function Checkout() {
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, color: '#6b7280' }}>
                   <span>{t('shippingLabel')}</span>
-                  <span style={{ fontWeight: 700, color: shipping === 0 ? '#16a34a' : '#1a1a2e' }}>
-                    {shipping === 0 ? t('freeLabel') : `${shipping.toFixed(2)} ${t('currency')}`}
-                  </span>
+                  <span style={{ fontWeight: 700, color: '#1a1a2e' }}>{shipping.toFixed(2)} {t('currency')}</span>
                 </div>
                 <div style={{ borderTop: '2px solid #f3f4f6', paddingTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 20, fontWeight: 800 }}>

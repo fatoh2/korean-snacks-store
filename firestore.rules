@@ -40,7 +40,7 @@ service cloud.firestore {
         && order.discount is number
         && order.discount >= 0
         && order.discount <= order.subtotal
-        && order.shipping in [0, 15]
+        && order.shipping == 15
         && order.total is number
         && order.total == order.subtotal - order.discount + order.shipping
         && order.status == 'pending'
