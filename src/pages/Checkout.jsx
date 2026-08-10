@@ -88,7 +88,10 @@ export default function Checkout() {
     }
 
     const sep = '━━━━━━━━━━━━━━━';
-    const itemLines = items.map(item => `• ${item.name} × ${item.quantity} — ₪${(item.price * item.quantity).toFixed(2)}`).join('\n');
+    const itemLines = items.map(item => [
+      `• ${item.name} × ${item.quantity} — ₪${(item.price * item.quantity).toFixed(2)}`,
+      item.imageUrl ? `  🖼️ ${item.imageUrl}` : '',
+    ].filter(Boolean).join('\n')).join('\n');
     const shippingText = `₪${shipping.toFixed(2)}`;
     const addressParts = [form.city, form.district, form.street, form.building].filter(Boolean).join(', ');
 
