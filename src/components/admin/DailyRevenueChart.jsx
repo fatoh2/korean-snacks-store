@@ -1,10 +1,12 @@
+import { formatAdminDate } from './adminFormat';
+
 export default function DailyRevenueChart({ orders }) {
   if (!orders.length) return <div style={{ color: '#9ca3af', fontSize: 13, textAlign: 'center', padding: 20 }}>لا توجد بيانات</div>;
 
   // Group by day
   const dayMap = {};
   orders.forEach(o => {
-    const day = new Date(o.date).toLocaleDateString('ar-IL', { month: 'short', day: 'numeric' });
+    const day = formatAdminDate(o.date);
     dayMap[day] = (dayMap[day] || 0) + (o.total || 0);
   });
 

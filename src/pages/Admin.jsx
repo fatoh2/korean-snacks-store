@@ -10,6 +10,8 @@ import PromoCodesTab from '../components/admin/PromoCodesTab';
 import OrdersTab from '../components/admin/OrdersTab';
 import AnalyticsTab from '../components/admin/AnalyticsTab';
 import CustomersTab from '../components/admin/CustomersTab';
+import { useLanguage } from '../context/LanguageContext';
+import { latinNumber } from '../components/admin/adminFormat';
 
 const DEFAULT_ADMIN_CATEGORIES = [
   { name: 'رامن', emoji: '🍜' }, { name: 'رقائق', emoji: '🍟' },
@@ -19,6 +21,7 @@ const DEFAULT_ADMIN_CATEGORIES = [
 ];
 
 export default function Admin() {
+  const { tr } = useLanguage();
   const { products, addProduct, removeProduct, updateProduct, seedProducts } = useProducts();
   const [tab, setTab] = useState('list');
   const [search, setSearch] = useState('');
@@ -113,12 +116,12 @@ export default function Admin() {
   const sortedProducts = [...products].sort((a, b) => (a.sortOrder ?? a.id * 10) - (b.sortOrder ?? b.id * 10));
 
   const TABS = [
-    ['list', '📋 المنتجات'],
-    ['add', editingId ? '✏️ تعديل' : '➕ إضافة منتج'],
-    ['codes', '🎟️ أكواد الخصم'],
-    ['orders', '🗂️ الطلبات'],
-    ['analytics', '📊 الإحصاءات'],
-    ['customers', '👥 العملاء'],
+    ['list', `📋 ${tr('المنتجات', 'Items', 'מוצרים')}`],
+    ['add', editingId ? `✏️ ${tr('تعديل', 'Edit', 'עריכה')}` : `➕ ${tr('إضافة منتج', 'Add item', 'הוספת מוצר')}`],
+    ['codes', `🎟️ ${tr('أكواد الخصم', 'Promo codes', 'קודי הנחה')}`],
+    ['orders', `🗂️ ${tr('الطلبات', 'Orders', 'הזמנות')}`],
+    ['analytics', `📊 ${tr('الإحصاءات', 'Analytics', 'נתונים')}`],
+    ['customers', `👥 ${tr('العملاء', 'Customers', 'לקוחות')}`],
   ];
 
   return (
@@ -127,11 +130,11 @@ export default function Admin() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
         <div style={{ fontSize: 36 }}>⚙️</div>
         <div>
-          <h1 style={{ fontWeight: 800, fontSize: 24, color: '#1a1a2e', margin: 0 }}>لوحة الإدارة</h1>
-          <p style={{ color: '#6b7280', fontSize: 14, margin: 0 }}>إدارة منتجات متجر Lulu Tokki</p>
+          <h1 style={{ fontWeight: 800, fontSize: 24, color: '#1a1a2e', margin: 0 }}>{tr('لوحة الإدارة', 'Admin dashboard', 'לוח ניהול')}</h1>
+          <p style={{ color: '#6b7280', fontSize: 14, margin: 0 }}>{tr('إدارة متجر Lulu Tokki', 'Manage the Lulu Tokki store', 'ניהול חנות Lulu Tokki')}</p>
         </div>
-        <div style={{ marginRight: 'auto' }}>
-          <AdminBadge color="var(--brand-blue)" bg="#eff6ff">{products.length} منتج إجمالاً</AdminBadge>
+        <div style={{ marginInlineStart: 'auto' }}>
+          <AdminBadge color="var(--brand-blue)" bg="#eff6ff">{latinNumber(products.length)} {tr('منتج إجمالاً', 'items total', 'מוצרים בסך הכול')}</AdminBadge>
         </div>
       </div>
 

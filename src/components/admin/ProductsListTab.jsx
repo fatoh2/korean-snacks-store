@@ -5,11 +5,14 @@ import toast from 'react-hot-toast';
 import AdminBadge from './AdminBadge';
 import { inputStyle, toastStyle } from './adminStyles';
 import CategoryManager from './CategoryManager';
+import { useLanguage } from '../../context/LanguageContext';
+import { latinNumber } from './adminFormat';
 
 export default function ProductsListTab({
   products, categories, search, setSearch, onEdit, onDuplicate, onRemove,
   updateProduct,
 }) {
+  const { tr } = useLanguage();
   const [confirmId, setConfirmId] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [bulkPct, setBulkPct] = useState('');
@@ -108,7 +111,7 @@ export default function ProductsListTab({
         <div style={{ position: 'relative', flex: 1, maxWidth: 420 }}>
           <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 16 }}>🔍</span>
           <input
-            type="text" placeholder="ابحث في المنتجات..."
+            type="text" placeholder={tr('ابحث في المنتجات...', 'Search items...', 'חיפוש מוצרים...')}
             value={search} onChange={e => setSearch(e.target.value)}
             style={{ ...inputStyle(false), paddingRight: 38 }}
             onFocus={e => e.target.style.borderColor = 'var(--brand)'}
@@ -122,7 +125,7 @@ export default function ProductsListTab({
           color: showCategories ? 'var(--brand)' : '#6b7280',
           fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer',
         }}>
-          📂 إدارة الفئات
+          📂 {tr('إدارة الفئات', 'Manage categories', 'ניהול קטגוריות')}
         </button>
       </div>
 
@@ -144,28 +147,28 @@ export default function ProductsListTab({
 
       {/* Table */}
       <div style={{ background: 'white', borderRadius: 16, border: '1px solid #e5e7eb', overflowX: 'auto', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '36px 50px 220px 100px 80px 80px 100px 120px 60px', gap: 0, minWidth: 906, background: '#f8f9fb', borderBottom: '2px solid #e5e7eb', padding: '12px 16px', fontSize: 12, fontWeight: 800, color: '#6b7280', alignItems: 'center' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '36px 50px minmax(220px, 1fr) 110px 82px 82px 105px 150px 86px', gap: 0, minWidth: 980, background: '#f8f9fb', borderBottom: '2px solid #e5e7eb', padding: '12px 16px', fontSize: 12, fontWeight: 800, color: '#6b7280', alignItems: 'center' }}>
           <span>
             <input type="checkbox" checked={selectedIds.size === filtered.length && filtered.length > 0} onChange={toggleAll} style={{ cursor: 'pointer' }} />
           </span>
-          <span>رمز</span>
-          <span>اسم المنتج</span>
-          <span>الفئة</span>
-          <span>السعر</span>
-          <span>التقييم</span>
-          <span>المخزون</span>
-          <span>إجراء</span>
-          <span>ترتيب</span>
+          <span>{tr('رمز', 'Icon', 'סמל')}</span>
+          <span>{tr('اسم المنتج', 'Item name', 'שם המוצר')}</span>
+          <span>{tr('الفئة', 'Category', 'קטגוריה')}</span>
+          <span>{tr('السعر', 'Price', 'מחיר')}</span>
+          <span>{tr('التقييم', 'Rating', 'דירוג')}</span>
+          <span>{tr('المخزون', 'Stock', 'מלאי')}</span>
+          <span>{tr('إجراء', 'Actions', 'פעולות')}</span>
+          <span>{tr('ترتيب', 'Order', 'סדר')}</span>
         </div>
 
         {filtered.length === 0 ? (
           <div style={{ padding: '40px 16px', textAlign: 'center', color: '#9ca3af', fontSize: 14 }}>
-            لا توجد منتجات مطابقة
+            {tr('لا توجد منتجات مطابقة', 'No matching items', 'לא נמצאו מוצרים מתאימים')}
           </div>
         ) : filtered.map((p, i) => (
           <div key={p.id} style={{
-            display: 'grid', gridTemplateColumns: '36px 50px 220px 100px 80px 80px 100px 120px 60px',
-            gap: 0, minWidth: 906, padding: '12px 16px', alignItems: 'center',
+            display: 'grid', gridTemplateColumns: '36px 50px minmax(220px, 1fr) 110px 82px 82px 105px 150px 86px',
+            gap: 0, minWidth: 980, padding: '12px 16px', alignItems: 'center',
             background: selectedIds.has(p.id) ? 'var(--brand-soft)' : i % 2 === 0 ? 'white' : '#fafafa',
             borderBottom: '1px solid #f3f4f6', transition: 'background 0.15s',
           }}
@@ -178,7 +181,7 @@ export default function ProductsListTab({
             <div style={{ fontSize: 24, textAlign: 'center' }}>{p.emoji}</div>
             <div>
               <div style={{ fontWeight: 700, fontSize: 13, color: '#1a1a2e', lineHeight: 1.3 }}>{p.name}</div>
-              <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{p.brand} • ID: {p.id}</div>
+              <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>{p.brand} • ID: {latinNumber(p.id)}</div>
             </div>
             <div><AdminBadge color="var(--brand-blue)" bg="#eff6ff">{p.category}</AdminBadge></div>
             <div style={{ fontWeight: 800, fontSize: 14, color: '#1a1a2e' }}>{p.price.toFixed(2)}</div>
@@ -191,11 +194,11 @@ export default function ProductsListTab({
                   : <AdminBadge color="#16a34a" bg="#f0fdf4">&#x2705; {p.stock != null ? p.stock : '∞'}</AdminBadge>
               }
             </div>
-            <div style={{ display: 'flex', gap: 4 }}>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'nowrap' }}>
               {confirmId === p.id ? (
                 <>
-                  <button onClick={() => handleRemove(p.id)} style={{ padding: '4px 10px', borderRadius: 6, border: 'none', background: 'var(--brand)', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>تأكيد</button>
-                  <button onClick={() => setConfirmId(null)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #e5e7eb', background: 'white', color: '#6b7280', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>إلغاء</button>
+                  <button onClick={() => handleRemove(p.id)} style={{ padding: '4px 10px', borderRadius: 6, border: 'none', background: 'var(--brand)', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>{tr('تأكيد', 'Confirm', 'אישור')}</button>
+                  <button onClick={() => setConfirmId(null)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #e5e7eb', background: 'white', color: '#6b7280', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>{tr('إلغاء', 'Cancel', 'ביטול')}</button>
                 </>
               ) : (
                 <>
@@ -214,16 +217,16 @@ export default function ProductsListTab({
                 </>
               )}
             </div>
-            <div style={{ display: 'flex', gap: 2 }}>
-              <button onClick={() => moveProduct(p, 'up')} style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid #e5e7eb', background: 'white', cursor: 'pointer', fontSize: 12 }}>&#x25B2;</button>
-              <button onClick={() => moveProduct(p, 'down')} style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid #e5e7eb', background: 'white', cursor: 'pointer', fontSize: 12 }}>&#x25BC;</button>
+            <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
+              <button aria-label={tr('تحريك لأعلى', 'Move up', 'הזזה למעלה')} title={tr('تحريك لأعلى', 'Move up', 'הזזה למעלה')} onClick={() => moveProduct(p, 'up')} style={{ width: 34, padding: '4px 0', borderRadius: 6, border: '1px solid #e5e7eb', background: 'white', cursor: 'pointer', fontSize: 12 }}>&#x25B2;</button>
+              <button aria-label={tr('تحريك لأسفل', 'Move down', 'הזזה למטה')} title={tr('تحريك لأسفل', 'Move down', 'הזזה למטה')} onClick={() => moveProduct(p, 'down')} style={{ width: 34, padding: '4px 0', borderRadius: 6, border: '1px solid #e5e7eb', background: 'white', cursor: 'pointer', fontSize: 12 }}>&#x25BC;</button>
             </div>
           </div>
         ))}
       </div>
 
       <div style={{ marginTop: 12, fontSize: 13, color: '#9ca3af', textAlign: 'center' }}>
-        عرض {filtered.length} من {products.length} منتج
+        {tr('عرض', 'Showing', 'מציג')} {latinNumber(filtered.length)} {tr('من', 'of', 'מתוך')} {latinNumber(products.length)} {tr('منتج', 'items', 'מוצרים')}
       </div>
 
       {/* Bulk price bar */}

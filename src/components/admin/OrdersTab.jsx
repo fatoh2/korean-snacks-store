@@ -1,17 +1,29 @@
 import { useState, useMemo } from 'react';
-import { writeBatch, doc } from 'firebase/firestore';
+import { writeBatch, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import toast from 'react-hot-toast';
 import AdminBadge from './AdminBadge';
 import { ORDER_STATUS, inputStyle, toastStyle } from './adminStyles';
 import { normalizeWhatsAppPhone } from '../../utils/order';
+import { useLanguage } from '../../context/LanguageContext';
+import { formatAdminDate, formatAdminDateTime, latinNumber } from './adminFormat';
 
 export default function OrdersTab({ orders, setOrders, loading, loaded }) {
+  const { tr } = useLanguage();
   const [filter, setFilter] = useState('all');
   const [expanded, setExpanded] = useState(null);
   const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [bulkStatus, setBulkStatus] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null);
+
+  const statusLabel = (status) => ({
+    pending: tr('قيد الانتظار', 'Pending', 'ממתין'),
+    confirmed: tr('تم التأكيد', 'Confirmed', 'אושר'),
+    shipped: tr('تم الشحن', 'Shipped', 'נשלח'),
+    delivered: tr('تم التوصيل', 'Delivered', 'נמסר'),
+    cancelled: tr('ملغي', 'Cancelled', 'בוטל'),
+  })[status] || status;
 
   // Repeat customer counts
   const customerCounts = useMemo(() => {
@@ -43,9 +55,57 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
   }, [orders, filter, search]);
 
   const handleUpdateStatus = async (orderId, newStatus) => {
+    const order = orders.find(item => item.id === orderId);
+    const shouldNotify = order && (newStatus === 'confirmed' || newStatus === 'shipped');
+    const whatsappWindow = shouldNotify ? window.open('', '_blank') : null;
+    if (whatsappWindow) whatsappWindow.opener = null;
     const { updateDoc: ud } = await import('firebase/firestore');
-    await ud(doc(db, 'orders', orderId), { status: newStatus });
-    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    try {
+      await ud(doc(db, 'orders', orderId), { status: newStatus });
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+      if (shouldNotify) {
+        const phone = normalizeWhatsAppPhone(order.phone);
+        if (!phone) {
+          whatsappWindow?.close();
+          toast.error(tr('تم تحديث الحالة، لكن رقم الهاتف غير صالح', 'Status updated, but the phone number is invalid', 'הסטטוס עודכן, אך מספר הטלפון אינו תקין'), { style: toastStyle });
+          return;
+        }
+        const statusMessage = newStatus === 'confirmed'
+          ? tr(
+              `مرحباً ${order.customerName || ''}، تم تأكيد طلبك رقم #${order.id?.slice(0, 8)} من Lulu Tokki ✅\nسنتواصل معك عند شحن الطلب. شكراً لك!`,
+              `Hello ${order.customerName || ''}, your Lulu Tokki order #${order.id?.slice(0, 8)} has been confirmed ✅\nWe will contact you when it ships. Thank you!`,
+              `שלום ${order.customerName || ''}, ההזמנה שלך מ-Lulu Tokki מספר #${order.id?.slice(0, 8)} אושרה ✅\nנעדכן אותך כשהיא תישלח. תודה!`,
+            )
+          : tr(
+              `مرحباً ${order.customerName || ''}، تم شحن طلبك رقم #${order.id?.slice(0, 8)} من Lulu Tokki 🚚\nالطلب في طريقه إليك!`,
+              `Hello ${order.customerName || ''}, your Lulu Tokki order #${order.id?.slice(0, 8)} has shipped 🚚\nIt is on its way to you!`,
+              `שלום ${order.customerName || ''}, ההזמנה שלך מ-Lulu Tokki מספר #${order.id?.slice(0, 8)} נשלחה 🚚\nהיא בדרך אליך!`,
+            );
+        const url = `https://wa.me/${phone}?text=${encodeURIComponent(statusMessage)}`;
+        if (whatsappWindow) whatsappWindow.location.href = url;
+        else window.location.assign(url);
+      }
+    } catch {
+      whatsappWindow?.close();
+      toast.error(tr('فشل تحديث حالة الطلب', 'Failed to update order status', 'עדכון סטטוס ההזמנה נכשל'), { style: toastStyle });
+    }
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    try {
+      await deleteDoc(doc(db, 'orders', orderId));
+      setOrders(prev => prev.filter(order => order.id !== orderId));
+      setSelectedIds(prev => {
+        const next = new Set(prev);
+        next.delete(orderId);
+        return next;
+      });
+      setConfirmDelete(null);
+      setExpanded(null);
+      toast.success(tr('تم حذف الطلب', 'Order deleted', 'ההזמנה נמחקה'), { style: toastStyle });
+    } catch {
+      toast.error(tr('تعذر حذف الطلب', 'Could not delete the order', 'לא ניתן למחוק את ההזמנה'), { style: toastStyle });
+    }
   };
 
   const handleBulkStatus = async () => {
@@ -54,7 +114,7 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
     selectedIds.forEach(id => batch.update(doc(db, 'orders', id), { status: bulkStatus }));
     await batch.commit();
     setOrders(prev => prev.map(o => selectedIds.has(o.id) ? { ...o, status: bulkStatus } : o));
-    toast.success(`تم تحديث ${selectedIds.size} طلب إلى "${ORDER_STATUS[bulkStatus]?.label}" ✅`, { style: toastStyle });
+    toast.success(tr(`تم تحديث ${latinNumber(selectedIds.size)} طلب إلى "${statusLabel(bulkStatus)}" ✅`, `${latinNumber(selectedIds.size)} orders updated to "${statusLabel(bulkStatus)}" ✅`, `${latinNumber(selectedIds.size)} הזמנות עודכנו ל-"${statusLabel(bulkStatus)}" ✅`), { style: toastStyle });
     setSelectedIds(new Set());
     setBulkStatus('');
   };
@@ -82,7 +142,11 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
       return;
     }
     const items = (order.items || []).map(i => `• ${i.emoji || ''} ${i.name} × ${i.quantity}`).join('\n');
-    const msg = `مرحباً ${order.customerName || ''},\n\nتفاصيل طلبك من Lulu Tokki:\n${items}\n\nالمجموع: ${(order.total || 0).toFixed(2)} ₪\nالحالة: ${ORDER_STATUS[order.status || 'pending']?.label || order.status}\n\nشكراً لتسوقك معنا! 🐰`;
+    const msg = tr(
+      `مرحباً ${order.customerName || ''},\n\nتفاصيل طلبك من Lulu Tokki:\n${items}\n\nالمجموع: ${(order.total || 0).toFixed(2)} ₪\nالحالة: ${statusLabel(order.status || 'pending')}\n\nشكراً لتسوقك معنا! 🐰`,
+      `Hello ${order.customerName || ''},\n\nYour Lulu Tokki order details:\n${items}\n\nTotal: ${(order.total || 0).toFixed(2)} ₪\nStatus: ${statusLabel(order.status || 'pending')}\n\nThank you for shopping with us! 🐰`,
+      `שלום ${order.customerName || ''},\n\nפרטי ההזמנה שלך מ-Lulu Tokki:\n${items}\n\nסה״כ: ${(order.total || 0).toFixed(2)} ₪\nסטטוס: ${statusLabel(order.status || 'pending')}\n\nתודה שקנית אצלנו! 🐰`,
+    );
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
@@ -95,7 +159,7 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
     <p style="text-align:center;color:#6b7280;font-size:13px;margin:4px 0 20px">فاتورة طلب</p>
     <div style="background:#f8f9fb;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px">
       <div><b>رقم الطلب:</b> ${order.id?.slice(0, 8)}</div>
-      <div><b>التاريخ:</b> ${new Date(order.date).toLocaleDateString('ar-IL', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+      <div><b>${tr('التاريخ:', 'Date:', 'תאריך:')}</b> ${formatAdminDate(order.date)}</div>
       <div><b>الزبون:</b> ${order.customerName || ''}</div>
       <div><b>الهاتف:</b> <span dir="ltr">${order.phone || ''}</span></div>
       ${order.address ? `<div><b>العنوان:</b> ${[order.address.city, order.address.district, order.address.street, order.address.building].filter(Boolean).join(', ')}</div>` : ''}
@@ -118,12 +182,12 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
   const exportCSV = () => {
     const headers = ['رقم الطلب', 'التاريخ', 'الزبون', 'الهاتف', 'المدينة', 'المنتجات', 'المجموع الفرعي', 'الخصم', 'الشحن', 'الإجمالي', 'الحالة', 'كود الخصم'];
     const rows = visibleOrders.map(o => [
-      o.id || '', new Date(o.date).toLocaleDateString('ar-IL'),
+      o.id || '', formatAdminDate(o.date),
       o.customerName || '', o.phone || '', o.address?.city || '',
       (o.items || []).map(i => `${i.name} ×${i.quantity}`).join(' | '),
       (o.subtotal || 0).toFixed(2), (o.discount || 0).toFixed(2),
       (o.shipping || 0).toFixed(2), (o.total || 0).toFixed(2),
-      ORDER_STATUS[o.status || 'pending']?.label || o.status || '',
+      statusLabel(o.status || 'pending'),
       o.promoCode || '',
     ]);
     const csv = '﻿' + [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
@@ -146,7 +210,7 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
       <div style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, maxWidth: 360 }}>
           <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 16 }}>🔍</span>
-          <input type="text" placeholder="ابحث بالاسم، الهاتف، أو رقم الطلب..."
+          <input type="text" placeholder={tr('ابحث بالاسم، الهاتف، أو رقم الطلب...', 'Search by name, phone, or order number...', 'חיפוש לפי שם, טלפון או מספר הזמנה...')}
             value={search} onChange={e => setSearch(e.target.value)}
             style={{ ...inputStyle(false), paddingRight: 38 }}
             onFocus={e => e.target.style.borderColor = 'var(--brand)'}
@@ -157,19 +221,19 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
           onMouseEnter={e => { e.currentTarget.style.background = '#059669'; e.currentTarget.style.color = 'white'; }}
           onMouseLeave={e => { e.currentTarget.style.background = '#ecfdf5'; e.currentTarget.style.color = '#059669'; }}
         >
-          📥 تصدير CSV
+          📥 {tr('تصدير CSV', 'Export CSV', 'ייצוא CSV')}
         </button>
         {selectedIds.size > 0 && (
           <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <input type="checkbox" checked={selectedIds.size === visibleOrders.length} onChange={toggleAll} style={{ cursor: 'pointer' }} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#6b7280' }}>تحديد الكل</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#6b7280' }}>{tr('تحديد الكل', 'Select all', 'בחירת הכול')}</span>
           </label>
         )}
       </div>
 
       {/* Status filter pills */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
-        {[['all', 'الكل'], ...Object.keys(ORDER_STATUS).map(s => [s, ORDER_STATUS[s].label])].map(([key, label]) => (
+        {[['all', tr('الكل', 'All', 'הכול')], ...Object.keys(ORDER_STATUS).map(s => [s, statusLabel(s)])].map(([key, label]) => (
           <button key={key} onClick={() => setFilter(key)} style={{
             padding: '6px 16px', borderRadius: 20, border: '2px solid',
             borderColor: filter === key ? 'var(--brand)' : '#e5e7eb',
@@ -177,13 +241,13 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
             color: filter === key ? 'white' : '#374151',
             fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer',
           }}>
-            {label}{orderCounts[key] > 0 ? ` (${orderCounts[key]})` : ''}
+            {label}{orderCounts[key] > 0 ? ` (${latinNumber(orderCounts[key])})` : ''}
           </button>
         ))}
       </div>
 
       {visibleOrders.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af', fontSize: 14 }}>لا توجد طلبات مطابقة</div>
+        <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af', fontSize: 14 }}>{tr('لا توجد طلبات مطابقة', 'No matching orders', 'לא נמצאו הזמנות מתאימות')}</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {visibleOrders.map(order => {
@@ -194,18 +258,17 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
             const fullAddress = order.address
               ? [order.address.city, order.address.district, order.address.street, order.address.building].filter(Boolean).join('، ')
               : '';
-            const orderDate = order.date ? new Date(order.date) : null;
             return (
               <div key={order.id} style={{ background: 'white', borderRadius: 16, border: selectedIds.has(order.id) ? '2px solid var(--brand)' : '1px solid #f0f0f0', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
                 <div style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                   <input type="checkbox" checked={selectedIds.has(order.id)} onChange={() => toggleSelect(order.id)} onClick={e => e.stopPropagation()} style={{ cursor: 'pointer', flexShrink: 0 }} />
-                  <span style={{ background: sc.bg, color: sc.color, fontWeight: 700, fontSize: 12, padding: '4px 10px', borderRadius: 8, flexShrink: 0 }}>{sc.icon} {sc.label}</span>
+                  <span style={{ background: sc.bg, color: sc.color, fontWeight: 700, fontSize: 12, padding: '4px 10px', borderRadius: 8, flexShrink: 0 }}>{sc.icon} {statusLabel(status)}</span>
                   <div style={{ flex: 1, minWidth: 160, cursor: 'pointer' }} onClick={() => setExpanded(isExpanded ? null : order.id)}>
                     <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                       {order.customerName || 'زبون'}
                       {repeatCount > 1 && <AdminBadge color="#7c3aed" bg="#f5f3ff">🔄 زبون متكرر ({repeatCount})</AdminBadge>}
                     </div>
-                    <div style={{ fontSize: 12, color: '#9ca3af', direction: 'ltr' }}>{order.phone} • {new Date(order.date).toLocaleDateString('ar-IL', { month: 'short', day: 'numeric' })}</div>
+                    <div style={{ fontSize: 12, color: '#9ca3af', direction: 'ltr' }}>{order.phone} • {formatAdminDate(order.date)}</div>
                   </div>
                   {order.address?.city && <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 600 }}>📍 {order.address.city}</div>}
                   <div style={{ fontWeight: 800, fontSize: 15, color: 'var(--brand)', flexShrink: 0 }}>{(order.total || 0).toFixed(2)} ₪</div>
@@ -237,9 +300,9 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
                         <div style={{ fontWeight: 800, fontSize: 13, color: 'var(--brand)', marginBottom: 10 }}>🧾 بيانات الطلب</div>
                         <div style={{ display: 'grid', gap: 6, fontSize: 13, color: 'var(--text)' }}>
                           <div><b>رقم الطلب:</b> <span dir="ltr" style={{ fontSize: 11, wordBreak: 'break-all' }}>{order.id}</span></div>
-                          <div><b>التاريخ:</b> {orderDate && !Number.isNaN(orderDate.getTime()) ? orderDate.toLocaleString('ar-IL', { dateStyle: 'full', timeStyle: 'short' }) : 'غير مسجل'}</div>
-                          <div><b>الحالة:</b> {sc.icon} {sc.label}</div>
-                          <div><b>عدد المنتجات:</b> {(order.items || []).reduce((sum, item) => sum + (item.quantity || 0), 0)}</div>
+                          <div><b>{tr('التاريخ:', 'Date:', 'תאריך:')}</b> {formatAdminDateTime(order.date)}</div>
+                          <div><b>{tr('الحالة:', 'Status:', 'סטטוס:')}</b> {sc.icon} {statusLabel(status)}</div>
+                          <div><b>{tr('عدد المنتجات:', 'Item count:', 'מספר פריטים:')}</b> {latinNumber((order.items || []).reduce((sum, item) => sum + (item.quantity || 0), 0))}</div>
                         </div>
                       </div>
                     </div>
@@ -290,20 +353,34 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       {sc.next && (
                         <button onClick={() => handleUpdateStatus(order.id, sc.next)} style={{ padding: '7px 18px', borderRadius: 8, border: 'none', background: 'var(--brand)', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
-                          {ORDER_STATUS[sc.next].icon} تحديث إلى: {ORDER_STATUS[sc.next].label}
+                          {ORDER_STATUS[sc.next].icon} {tr('تحديث إلى:', 'Update to:', 'עדכון ל:')} {statusLabel(sc.next)}
                         </button>
                       )}
                       {status !== 'cancelled' && status !== 'delivered' && (
                         <button onClick={() => handleUpdateStatus(order.id, 'cancelled')} style={{ padding: '7px 18px', borderRadius: 8, border: '2px solid #e5e7eb', background: 'white', color: '#6b7280', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
-                          ❌ إلغاء
+                        ❌ {tr('إلغاء', 'Cancel order', 'ביטול הזמנה')}
                         </button>
                       )}
                       <button onClick={() => openWhatsApp(order)} style={{ padding: '7px 18px', borderRadius: 8, border: 'none', background: '#25d366', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
-                        💬 واتساب
+                        💬 {tr('واتساب', 'WhatsApp', 'WhatsApp')}
                       </button>
                       <button onClick={() => printOrder(order)} style={{ padding: '7px 18px', borderRadius: 8, border: '2px solid #dbeafe', background: '#eff6ff', color: 'var(--brand-blue)', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
-                        🖨️ طباعة
+                        🖨️ {tr('طباعة', 'Print', 'הדפסה')}
                       </button>
+                      {confirmDelete === order.id ? (
+                        <>
+                          <button onClick={() => handleDeleteOrder(order.id)} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: '#dc2626', color: 'white', fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
+                            {tr('تأكيد الحذف', 'Confirm delete', 'אישור מחיקה')}
+                          </button>
+                          <button onClick={() => setConfirmDelete(null)} style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--card)', color: 'var(--subtext)', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                            {tr('إلغاء', 'Cancel', 'ביטול')}
+                          </button>
+                        </>
+                      ) : (
+                        <button onClick={() => setConfirmDelete(order.id)} style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #fecaca', background: '#fef2f2', color: '#dc2626', fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                          🗑️ {tr('حذف الطلب', 'Delete order', 'מחיקת הזמנה')}
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -325,22 +402,22 @@ export default function OrdersTab({ orders, setOrders, loading, loaded }) {
             {selectedIds.size} طلب محدد
           </span>
           <select value={bulkStatus} onChange={e => setBulkStatus(e.target.value)} style={{ ...inputStyle(false), width: 180 }}>
-            <option value="">اختر الحالة...</option>
+            <option value="">{tr('اختر الحالة...', 'Choose status...', 'בחירת סטטוס...')}</option>
             {Object.entries(ORDER_STATUS).map(([key, val]) => (
-              <option key={key} value={key}>{val.icon} {val.label}</option>
+              <option key={key} value={key}>{val.icon} {statusLabel(key)}</option>
             ))}
           </select>
           <button onClick={handleBulkStatus} disabled={!bulkStatus} style={{
             padding: '10px 22px', background: bulkStatus ? 'var(--brand)' : '#d1d5db', color: 'white',
             border: 'none', borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 800, fontSize: 14, cursor: bulkStatus ? 'pointer' : 'default',
           }}>
-            ✅ تطبيق
+            ✅ {tr('تطبيق', 'Apply', 'החלה')}
           </button>
           <button onClick={() => { setSelectedIds(new Set()); setBulkStatus(''); }} style={{
             padding: '10px 18px', background: 'white', color: '#6b7280', border: '2px solid #e5e7eb',
             borderRadius: 10, fontFamily: 'Cairo, sans-serif', fontWeight: 700, fontSize: 13, cursor: 'pointer',
           }}>
-            إلغاء التحديد
+            {tr('إلغاء التحديد', 'Clear selection', 'ניקוי הבחירה')}
           </button>
         </div>
       )}

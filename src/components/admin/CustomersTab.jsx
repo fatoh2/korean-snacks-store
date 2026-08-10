@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import AdminBadge from './AdminBadge';
+import { formatAdminDate } from './adminFormat';
 import { inputStyle } from './adminStyles';
 
 export default function CustomersTab({ orders, loading, loaded }) {
@@ -117,7 +118,7 @@ export default function CustomersTab({ orders, loading, loaded }) {
             <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--brand-blue)' }}>{c.orders}</div>
             <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--brand)' }}>{c.totalSpent.toFixed(2)} ₪</div>
             <div style={{ fontSize: 12, color: '#6b7280' }}>
-              {c.lastDate ? c.lastDate.toLocaleDateString('ar-IL', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+              {c.lastDate ? formatAdminDate(c.lastDate) : '—'}
             </div>
           </div>
         ))}
