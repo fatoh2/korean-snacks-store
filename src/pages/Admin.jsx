@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useProducts } from '../context/ProductsContext';
 import AdminBadge from '../components/admin/AdminBadge';
@@ -32,7 +32,7 @@ export default function Admin() {
 
   // Shared orders state
   const [orders, setOrders] = useState([]);
-  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersLoaded, setOrdersLoaded] = useState(false);
 
   // Categories for product list
@@ -52,20 +52,22 @@ export default function Admin() {
     });
   }, []);
 
-  const loadOrders = async () => {
-    if (ordersLoaded) return;
-    setOrdersLoading(true);
-    try {
-      const snap = await getDocs(collection(db, 'orders'));
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'orders'), snap => {
       const arr = [];
       snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
       arr.sort((a, b) => new Date(b.date) - new Date(a.date));
       setOrders(arr);
       setOrdersLoaded(true);
-    } finally {
       setOrdersLoading(false);
-    }
-  };
+    }, error => {
+      console.error('Failed to load orders', error);
+      setOrdersLoaded(true);
+      setOrdersLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
 
   const handleSeed = async () => {
     setSeeding(true);
@@ -162,7 +164,6 @@ export default function Admin() {
           <button key={key} onClick={() => {
             setTab(key);
             if (key === 'list') { setEditingId(null); setForm(EMPTY_FORM); setSearch(''); }
-            if (key === 'analytics' || key === 'orders' || key === 'customers') loadOrders();
           }} style={{
             padding: '8px 20px', borderRadius: 9, border: 'none',
             background: tab === key ? 'var(--brand)' : 'transparent',

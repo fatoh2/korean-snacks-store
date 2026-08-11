@@ -8,9 +8,13 @@ const DEV_ORIGINS = ['http://localhost:5174', 'http://localhost:5173'];
 
 function corsHeaders(request, env) {
   const origin = request.headers.get('Origin') || '';
-  const allowed = origin === env.ALLOWED_ORIGIN || DEV_ORIGINS.includes(origin);
+  const productionOrigins = (env.ALLOWED_ORIGINS || env.ALLOWED_ORIGIN || '')
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean);
+  const allowed = productionOrigins.includes(origin) || DEV_ORIGINS.includes(origin);
   return {
-    'Access-Control-Allow-Origin': allowed ? origin : env.ALLOWED_ORIGIN,
+    'Access-Control-Allow-Origin': allowed ? origin : productionOrigins[0] || '',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Authorization, Content-Type',
     'Access-Control-Max-Age': '86400',
