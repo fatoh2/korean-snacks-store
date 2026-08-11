@@ -7,7 +7,9 @@ import { inputStyle, EMPTY_FORM, toastStyle } from './adminStyles';
 import { translateArToEnHe } from '../../utils/translate';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
-const IMAGE_UPLOAD_URL = import.meta.env.VITE_IMAGE_UPLOAD_URL;
+const IMAGE_UPLOAD_URL = import.meta.env.DEV
+  ? import.meta.env.VITE_IMAGE_UPLOAD_URL
+  : '/api/upload';
 
 export default function ProductFormTab({
   products, editingId, setEditingId, form, setForm, onSwitchToList, addProduct, updateProduct,
