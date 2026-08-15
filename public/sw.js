@@ -1,5 +1,8 @@
-const CACHE_NAME = 'hanook-v1';
-const PRECACHE_URLS = ['/', '/store', '/cart'];
+const CACHE_NAME = 'lulu-tokki-v2';
+const PRECACHE_URLS = [
+  '/', '/store', '/cart', '/manifest.json',
+  '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/apple-touch-icon.png',
+];
 
 // Install: precache key pages
 self.addEventListener('install', event => {

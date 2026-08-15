@@ -1,45 +1,52 @@
 {
+  "id": "/",
   "name": "Lulu Tokki",
   "short_name": "Lulu Tokki",
-  "description": "متجر السناكس الكورية الأصيلة — رامن، رقائق، حلوى، مشروبات",
-  "start_url": "/",
+  "description": "تشكيلة مختارة بعناية من أطيب النكهات العالمية تصل لباب بيتك",
+  "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#fffdf9",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#fffaf5",
   "theme_color": "#b8647d",
   "lang": "ar",
   "dir": "rtl",
   "categories": ["shopping", "food"],
   "icons": [
     {
-      "src": "/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-maskable.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ],
-  "screenshots": [],
   "shortcuts": [
     {
       "name": "المتجر",
       "short_name": "المتجر",
       "description": "تصفح المنتجات",
       "url": "/store",
-      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "سلة الشراء",
       "short_name": "السلة",
-      "description": "عرض السلة",
+      "description": "عرض سلة الشراء",
       "url": "/cart",
-      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }
