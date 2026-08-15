@@ -1,7 +1,7 @@
-const CACHE_NAME = 'lulu-tokki-v3';
+const CACHE_NAME = 'lulu-tokki-v4';
 const PRECACHE_URLS = [
   '/', '/store', '/cart', '/manifest.json',
-  '/icon-192-v2.png', '/icon-512-v2.png', '/icon-maskable-512-v2.png', '/apple-touch-icon-v2.png',
+  '/icon-192-v3.png', '/icon-512-v3.png', '/icon-maskable-512-v3.png', '/apple-touch-icon-v3.png',
 ];
 
 // Install: precache key pages

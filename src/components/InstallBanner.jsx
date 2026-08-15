@@ -107,7 +107,7 @@ export default function InstallBanner() {
       >×</button>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, paddingInlineEnd: 24 }}>
-        <img src="/icon-192-v2.png" alt="" width="62" height="62" style={{ borderRadius: 16, boxShadow: '0 6px 18px rgba(184,100,125,0.2)', flexShrink: 0 }} />
+        <img src="/icon-192-v3.png" alt="" width="62" height="62" style={{ borderRadius: 16, boxShadow: '0 6px 18px rgba(184,100,125,0.2)', flexShrink: 0 }} />
         <div>
           <div style={{ fontWeight: 900, fontSize: 16 }}>{tr('ثبّت Lulu Tokki على هاتفك', 'Install Lulu Tokki', 'התקינו את Lulu Tokki')}</div>
           <div style={{ color: 'var(--subtext)', fontSize: 12, lineHeight: 1.6, marginTop: 2 }}>
