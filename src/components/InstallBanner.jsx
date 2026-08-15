@@ -3,6 +3,16 @@ import { useLanguage } from '../context/LanguageContext';
 
 const DISMISS_KEY = 'lulu-tokki-install-dismissed-at';
 const DISMISS_FOR_MS = 7 * 24 * 60 * 60 * 1000;
+let pendingInstallPrompt = null;
+const installPromptSubscribers = new Set();
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', event => {
+    event.preventDefault();
+    pendingInstallPrompt = event;
+    installPromptSubscribers.forEach(subscriber => subscriber(event));
+  });
+}
 
 function isStandalone() {
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -29,23 +39,27 @@ export default function InstallBanner() {
     try { dismissedAt = Number(localStorage.getItem(DISMISS_KEY) || 0); } catch { /* Storage may be unavailable. */ }
     if (Date.now() - dismissedAt < DISMISS_FOR_MS) return undefined;
 
-    const showTimer = window.setTimeout(() => setVisible(true), 1200);
-    const capturePrompt = event => {
-      event.preventDefault();
+    const showNativePrompt = event => {
       setInstallPrompt(event);
       setVisible(true);
     };
+    installPromptSubscribers.add(showNativePrompt);
+    if (pendingInstallPrompt) showNativePrompt(pendingInstallPrompt);
+
+    const showTimer = isIosDevice()
+      ? window.setTimeout(() => setVisible(true), 1200)
+      : null;
     const installed = () => {
       setVisible(false);
       setInstallPrompt(null);
+      pendingInstallPrompt = null;
     };
 
-    window.addEventListener('beforeinstallprompt', capturePrompt);
     window.addEventListener('appinstalled', installed);
 
     return () => {
-      window.clearTimeout(showTimer);
-      window.removeEventListener('beforeinstallprompt', capturePrompt);
+      if (showTimer) window.clearTimeout(showTimer);
+      installPromptSubscribers.delete(showNativePrompt);
       window.removeEventListener('appinstalled', installed);
     };
   }, []);
@@ -61,6 +75,7 @@ export default function InstallBanner() {
     if (outcome === 'accepted') {
       setVisible(false);
       setInstallPrompt(null);
+      pendingInstallPrompt = null;
     }
   };
 
@@ -92,7 +107,7 @@ export default function InstallBanner() {
       >×</button>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, paddingInlineEnd: 24 }}>
-        <img src="/icon-192.png" alt="" width="62" height="62" style={{ borderRadius: 16, boxShadow: '0 6px 18px rgba(184,100,125,0.2)', flexShrink: 0 }} />
+        <img src="/icon-192-v2.png" alt="" width="62" height="62" style={{ borderRadius: 16, boxShadow: '0 6px 18px rgba(184,100,125,0.2)', flexShrink: 0 }} />
         <div>
           <div style={{ fontWeight: 900, fontSize: 16 }}>{tr('ثبّت Lulu Tokki على هاتفك', 'Install Lulu Tokki', 'התקינו את Lulu Tokki')}</div>
           <div style={{ color: 'var(--subtext)', fontSize: 12, lineHeight: 1.6, marginTop: 2 }}>
