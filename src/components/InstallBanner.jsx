@@ -119,7 +119,18 @@ export default function InstallBanner() {
       {showManualHelp && !installPrompt ? (
         <div style={{ marginTop: 13, padding: '10px 12px', borderRadius: 12, background: 'rgba(248,219,228,0.45)', fontSize: 12, lineHeight: 1.7 }}>
           {isIosDevice()
-            ? tr('على iPhone: اضغط زر المشاركة ثم اختر «إضافة إلى الشاشة الرئيسية».', 'On iPhone: tap Share, then choose “Add to Home Screen.”', 'ב-iPhone: לחצו על שיתוף ואז ״הוספה למסך הבית״.')
+            ? (
+              <div dir="ltr" style={{ textAlign: 'left' }}>
+                <div style={{ fontWeight: 900, fontSize: 13, color: 'var(--text)', marginBottom: 7 }}>
+                  Install on iPhone using Safari:
+                </div>
+                <ol style={{ margin: 0, paddingLeft: 20, display: 'grid', gap: 5, color: 'var(--subtext)' }}>
+                  <li>Tap the <strong style={{ color: 'var(--text)' }}>Share</strong> button <span aria-hidden="true">⬆️</span> at the bottom of Safari.</li>
+                  <li>Scroll down and tap <strong style={{ color: 'var(--text)' }}>Add to Home Screen</strong> <span aria-hidden="true">＋</span>.</li>
+                  <li>Tap <strong style={{ color: 'var(--text)' }}>Add</strong> in the top-right corner.</li>
+                </ol>
+              </div>
+            )
             : tr('افتح قائمة المتصفح ثم اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».', 'Open the browser menu, then choose “Install app” or “Add to Home screen.”', 'פתחו את תפריט הדפדפן ובחרו ״התקנת אפליקציה״ או ״הוספה למסך הבית״.')}
         </div>
       ) : null}
