@@ -2,6 +2,8 @@
 
 A multilingual Korean and international snacks storefront built with React, Vite, Firebase, and Cloudflare R2. The customer experience supports Arabic, Hebrew, and English, including RTL layouts.
 
+[Visit the live storefront](https://lulu-tokki.vercel.app/) · [View the portfolio case study](https://fhaj.vercel.app/work/lulu-tokki)
+
 ## Features
 
 - Product catalog, category filters, search, wishlist, cart, and product variants
