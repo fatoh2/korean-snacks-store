@@ -9,6 +9,8 @@ import { collection, addDoc, doc, getDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import { calculateOrderTotals, isValidPhone } from '../utils/order';
 
+const NOTIFY_ORDER_URL = import.meta.env.VITE_NOTIFY_ORDER_URL;
+
 function Field({ label, required, error, children }) {
   return (
     <div>
@@ -178,12 +180,32 @@ export default function Checkout() {
       return;
     }
 
-    const whatsappUrl = `https://wa.me/972547639465?text=${encodeURIComponent(msg)}`;
-    if (whatsappWindow) {
-      whatsappWindow.location.href = whatsappUrl;
+    let autoNotified = false;
+    if (NOTIFY_ORDER_URL) {
+      try {
+        const notifyRes = await fetch(NOTIFY_ORDER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: msg }),
+        });
+        autoNotified = notifyRes.ok;
+      } catch {
+        autoNotified = false;
+      }
+    }
+
+    if (autoNotified) {
+      // Order already delivered to the business WhatsApp automatically — no need
+      // to send the customer's own WhatsApp anywhere.
+      whatsappWindow?.close();
     } else {
-      // Same-tab navigation is not subject to popup blocking.
-      window.location.assign(whatsappUrl);
+      const whatsappUrl = `https://wa.me/972547639465?text=${encodeURIComponent(msg)}`;
+      if (whatsappWindow) {
+        whatsappWindow.location.href = whatsappUrl;
+      } else {
+        // Same-tab navigation is not subject to popup blocking.
+        window.location.assign(whatsappUrl);
+      }
     }
     setSubmittedOrder({
       items: [...items],
@@ -193,6 +215,7 @@ export default function Checkout() {
       shipping,
       total,
       form: { ...form },
+      autoNotified,
     });
     setSubmitted(true);
     clearCart();
@@ -227,11 +250,17 @@ export default function Checkout() {
             )}
           </p>
           <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.6, marginBottom: 28 }}>
-            {tr(
-              'تم فتح واتساب لإرسال طلبك. سنتواصل معك قريباً لتأكيد التفاصيل. 🐰',
-              "WhatsApp opened to send your order. We'll reach out shortly to confirm. 🐰",
-              'וואטסאפ נפתח לשליחת ההזמנה. ניצור איתך קשר בקרוב לאישור הפרטים. 🐰',
-            )}
+            {o.autoNotified
+              ? tr(
+                  'تم إرسال طلبك تلقائياً إلينا عبر واتساب. سنتواصل معك قريباً لتأكيد التفاصيل. 🐰',
+                  "Your order was sent to us on WhatsApp automatically. We'll reach out shortly to confirm. 🐰",
+                  'ההזמנה שלך נשלחה אלינו אוטומטית בוואטסאפ. ניצור איתך קשר בקרוב לאישור הפרטים. 🐰',
+                )
+              : tr(
+                  'تم فتح واتساب لإرسال طلبك. سنتواصل معك قريباً لتأكيد التفاصيل. 🐰',
+                  "WhatsApp opened to send your order. We'll reach out shortly to confirm. 🐰",
+                  'וואטסאפ נפתח לשליחת ההזמנה. ניצור איתך קשר בקרוב לאישור הפרטים. 🐰',
+                )}
           </p>
 
           {/* Order details card */}

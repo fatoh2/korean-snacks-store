@@ -38,6 +38,69 @@ async function verifyAdmin(request, env) {
   return payload.email;
 }
 
+function isAllowedOrigin(request, env) {
+  const origin = request.headers.get('Origin') || '';
+  const productionOrigins = (env.ALLOWED_ORIGINS || env.ALLOWED_ORIGIN || '')
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean);
+  return productionOrigins.includes(origin) || DEV_ORIGINS.includes(origin);
+}
+
+async function handleNotifyOrder(request, env, headers) {
+  if (!isAllowedOrigin(request, env)) {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: 403,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+    });
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+      status: 400,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const message = body?.message;
+  if (typeof message !== 'string' || !message.trim() || message.length > 4000) {
+    return new Response(JSON.stringify({ error: 'Invalid message' }), {
+      status: 400,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const waRes = await fetch(`https://graph.facebook.com/v21.0/${env.WHATSAPP_PHONE_NUMBER_ID}/messages`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.WHATSAPP_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to: env.NOTIFY_TO_NUMBER,
+      type: 'text',
+      text: { body: message },
+    }),
+  });
+
+  if (!waRes.ok) {
+    const errBody = await waRes.text();
+    return new Response(JSON.stringify({ error: 'WhatsApp send failed', detail: errBody }), {
+      status: 502,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+    });
+  }
+
+  return new Response(JSON.stringify({ success: true }), {
+    status: 200,
+    headers: { ...headers, 'Content-Type': 'application/json' },
+  });
+}
+
 export default {
   async fetch(request, env) {
     const headers = corsHeaders(request, env);
@@ -47,6 +110,11 @@ export default {
     }
 
     const url = new URL(request.url);
+
+    if (url.pathname === '/notify-order' && request.method === 'POST') {
+      return handleNotifyOrder(request, env, headers);
+    }
+
     if (url.pathname !== '/upload' || request.method !== 'POST') {
       return new Response('Not found', { status: 404, headers });
     }
